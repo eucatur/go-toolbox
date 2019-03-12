@@ -19,7 +19,7 @@ Informa se a API irá subir em modo debug, se for com true, irá loggar fazer um
 --debug=true //default false
 ```
 
-**Examplo para rodar em forma de teste**
+**Exemplo para rodar em forma de teste**
 
 ```code
 go run file.go --port=8080 --degub=true

@@ -12,7 +12,7 @@
   "json":"env"
 }
 
-//example.go
+//exemple.go
 package main
 
 import (
