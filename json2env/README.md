@@ -3,7 +3,7 @@
 É uma lib que le um arquivo json, e coloca os valores achados as variaveis de ambiente para poder ser lido com o pacote "os" do Go em qualquer arquivo 
 
 
-## Examplo ##
+## Exemplo ##
 
 ```code
 
