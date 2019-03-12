@@ -1,0 +1,4 @@
+{
+  "DB_TYPE":"sqlite3",
+  "PATH_TO_DB_FILE":"sqlite3.db"
+}
