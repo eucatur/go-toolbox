@@ -3,7 +3,6 @@ package database
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"time"
@@ -26,7 +25,6 @@ const ERROR_CONNECT = "Error in connect with database"
 func ConfigFromEnvFile(env_file_path string) (db *sqlx.DB, err error) {
 	db, exist := conections[env_file_path]
 	if !exist {
-		log.Println("Estanciou o arquivo: ", env_file_path)
 		if err = json2env.LoadFile(env_file_path); err != nil {
 			return db, err
 		}

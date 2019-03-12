@@ -13,7 +13,7 @@ func main() {
 
 	var users map[string]string
 
-	err := db.Select(&users, `select * from users`)
+	err = db.Select(&users, `select * from users`)
 
 	if err != nil {
 		panic(err)
