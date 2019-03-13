@@ -12,3 +12,7 @@ Repositório com o objetivo de compartilhar a "caixa de ferramentas" que utiliza
 ## database ##
 
 [database](https://github.com/eucatur/go-toolbox/tree/master/database) É um wrapper do [SQLx](https://github.com/jmoiron/sqlx) com o objetivo de entrar uma conexão com banco de dados (MySQL, Postgres ou SQLite) somente lhe indicando o arquivo env com os paramentros de conexão
+
+## cache ##
+
+[cache](https://github.com/eucatur/go-toolbox/tree/master/cache) É um wrapper do [go-cache](https://github.com/patrickmn/go-cache) uma lib de cache em memória com tempo de expiração, básicamente tem somente o metodo Set e Get 

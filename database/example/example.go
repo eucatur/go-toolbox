@@ -11,9 +11,9 @@ func main() {
 		panic(err)
 	}
 
-	var users map[string]string
+	var now string
 
-	err = db.Select(&users, `select * from users`)
+	err = db.Get(&now, `select now()`)
 
 	if err != nil {
 		panic(err)
