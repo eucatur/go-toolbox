@@ -9,6 +9,8 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+const PARAMETERS = "parameters"
+
 var (
 	MESSAGE  = "message"
 	validate *validator.Validate
@@ -19,19 +21,21 @@ type Handler struct {
 }
 
 // Like the name Validade and bind one struct with the validador golang lib
-func BindAndValidate(c echo.Context, object interface{}) (err error) {
+func BindAndValidate(c echo.Context, obj interface{}) (err error) {
 	validate = validator.New()
 
-	if err := c.Bind(object); err != nil {
+	if err := c.Bind(obj); err != nil {
 		return c.JSON(422, &Handler{err.Error()})
 	}
 
-	if err := validate.Struct(object); err != nil {
+	if err := validate.Struct(obj); err != nil {
 		log.Error(err)
 		return c.JSON(422, &Handler{err.Error()})
 	}
 
-	defaults.SetDefaults(object)
+	defaults.SetDefaults(obj)
+
+	c.Set(PARAMETERS, obj)
 
 	return
 }

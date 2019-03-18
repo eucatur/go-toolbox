@@ -33,6 +33,11 @@ func Make() *echo.Echo {
 	return echoServer
 }
 
+// Provides the instance of Echo
+func ProvideEchoInstance(task func(e *echo.Echo)) {
+	task(echoServer)
+}
+
 func Run() {
 	// For Heroku Work
 	porta := os.Getenv("PORT")
