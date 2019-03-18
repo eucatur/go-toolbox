@@ -2,7 +2,7 @@
 package handler
 
 import (
-	"log"
+	"github.com/eucatur/go-toolbox/log"
 
 	"github.com/labstack/echo"
 	"gopkg.in/go-playground/validator.v9"
