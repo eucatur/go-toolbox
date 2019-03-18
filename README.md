@@ -25,6 +25,10 @@ Repositório com o objetivo de compartilhar a "caixa de ferramentas" que utiliza
 
 [json2env](https://github.com/eucatur/go-toolbox/tree/master/json2env) é uma lib que le um arquivo json e coloca os valores no enviroment
 
+## jwt ##
+
+[jwt](https://github.com/eucatur/go-toolbox/tree/master/jwt) É um wrapper do [jwt-go](https://github.com/dgrijalva/jwt-go) para facilitar a utilização de jwt nos projetos
+
 ## log ##
 
 [log](https://github.com/eucatur/go-toolbox/tree/master/log) é uma lib para lidar com log, para log em arquivo ou no terminal com a linha do arquivo com o erro 
