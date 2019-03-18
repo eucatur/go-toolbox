@@ -5,6 +5,7 @@ import (
 	"github.com/eucatur/go-toolbox/log"
 
 	"github.com/labstack/echo"
+	defaults "github.com/mcuadros/go-defaults"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -29,6 +30,8 @@ func BindAndValidate(c echo.Context, object interface{}) (err error) {
 		log.Error(err)
 		return c.JSON(422, &Handler{err.Error()})
 	}
+
+	defaults.SetDefaults(object)
 
 	return
 }
