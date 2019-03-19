@@ -17,9 +17,6 @@ import (
 
 var conections = make(map[string]*sqlx.DB)
 
-// Because of Heroku, your default max conections is 20
-var max_open_conns = 20
-
 const ERROR_CONNECT = "Error in connect with database"
 
 func ConfigFromEnvFile(env_file_path string) (db *sqlx.DB, err error) {
@@ -59,14 +56,15 @@ func ConfigFromEnvFile(env_file_path string) (db *sqlx.DB, err error) {
 		}
 
 		if os.Getenv("MAX_OPEN_CONNS") != "" {
-			max_open_conns, err = strconv.Atoi(os.Getenv("MAX_OPEN_CONNS"))
+			max_open_conns, err := strconv.Atoi(os.Getenv("MAX_OPEN_CONNS"))
 
 			if err != nil {
 				return db, errors.New("ENV MAX_OPEN_CONNS is not int valid: " + env_file_path)
 			}
+
+			db.SetMaxOpenConns(max_open_conns)
 		}
 
-		db.SetMaxOpenConns(max_open_conns)
 		db.SetMaxIdleConns(5)
 		db.SetConnMaxLifetime(2 * time.Minute)
 		conections[env_file_path] = db
