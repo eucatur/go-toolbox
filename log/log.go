@@ -11,6 +11,12 @@ import (
 	"github.com/fatih/color"
 )
 
+var debug = false
+
+func EnableDebug(enable bool) {
+	debug = enable
+}
+
 // Print in terminal the error message and the line of code with de error
 func Error(e error) {
 	pc := make([]uintptr, 10)
@@ -31,12 +37,26 @@ func Error(e error) {
 	color.Unset()
 }
 
-// For use the same Println for the standart log lib
+// Println For use the same Println for the standart log lib
 func Println(a ...interface{}) {
 	log.Println(a)
 }
 
-// Save ou create a new log file with errors
+// Debug is a function for print in terminal if the variable debug it's true
+func Debug(a ...interface{}) {
+	if debug {
+		log.Println(a)
+	}
+}
+
+// Debugf is a function for print formated in terminal if the variable debug it's true
+func Debugf(format string, v ...interface{}) {
+	if debug {
+		log.Printf(format, v)
+	}
+}
+
+// File save ou create a new log file with errors
 func File(file, text string) error {
 	path := "logs"
 

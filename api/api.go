@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/eucatur/go-toolbox/log"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -49,6 +50,7 @@ func Run() {
 
 	if *debug {
 		echoServer.Use(middleware.Logger())
+		log.EnableDebug(true)
 	}
 
 	echoServer.Use(middleware.CORS())
