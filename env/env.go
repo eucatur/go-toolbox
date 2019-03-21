@@ -3,6 +3,8 @@
 package env
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"os"
 	"strconv"
 )
@@ -17,6 +19,39 @@ func Set(key, value string) error {
 func MustSet(key, value string) {
 	err := Set(key, value)
 	if err != nil {
+		panic(err)
+	}
+}
+
+// SetByJSONFile sets environment variables via json file
+func SetByJSONFile(filePath string) error {
+	var (
+		fileBytes []byte
+		values    map[string]string
+		err       error
+	)
+
+	if fileBytes, err = ioutil.ReadFile(filePath); err != nil {
+		return err
+	}
+
+	if err = json.Unmarshal(fileBytes, &values); err != nil {
+		return err
+	}
+
+	for key, value := range values {
+		if err = Set(key, value); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// MustSetByJSONFile sets environment variables via json file
+// and generates a panic in case of error
+func MustSetByJSONFile(filePath string) {
+	if err := SetByJSONFile(filePath); err != nil {
 		panic(err)
 	}
 }
