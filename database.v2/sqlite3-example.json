@@ -1,0 +1,5 @@
+{
+    "type": "sqlite3",
+    "path_to_db_file": "sqlite3.go",
+    "max_open_connections": 0
+}

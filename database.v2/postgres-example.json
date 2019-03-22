@@ -1,0 +1,10 @@
+{
+    "type": "postgres",
+    "host": "hh-pgsql-public.ebi.ac.uk",
+    "port": 5432,
+    "user": "reader",
+    "password": "NWDMCE5xdipIjRrp",
+    "database": "pfmegrnargs",
+    "max_open_connections": 0,
+    "ssl_mode": "disable"
+}
