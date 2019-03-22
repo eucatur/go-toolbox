@@ -4,16 +4,15 @@ package handler
 import (
 	"github.com/eucatur/go-toolbox/log"
 
+	"bitbucket.org/eucatur/go-toolbox/lib/validator"
 	"github.com/labstack/echo"
 	defaults "github.com/mcuadros/go-defaults"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 const PARAMETERS = "parameters"
 
 var (
-	MESSAGE  = "message"
-	validate *validator.Validate
+	MESSAGE = "message"
 )
 
 type Handler struct {
@@ -22,15 +21,13 @@ type Handler struct {
 
 // Like the name Validade and bind one struct with the validador golang lib
 func BindAndValidate(c echo.Context, obj interface{}) (err error) {
-	validate = validator.New()
-
 	if err := c.Bind(obj); err != nil {
 		return c.JSON(422, &Handler{err.Error()})
 	}
 
-	if err := validate.Struct(obj); err != nil {
+	if err := validator.Validate(obj); err != nil {
 		log.Error(err)
-		return c.JSON(422, &Handler{err.Error()})
+		return c.JSON(422, err)
 	}
 
 	defaults.SetDefaults(obj)
