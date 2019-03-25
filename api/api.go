@@ -3,7 +3,6 @@ package api
 import (
 	"flag"
 	"os"
-	"strconv"
 
 	"github.com/eucatur/go-toolbox/log"
 	"github.com/labstack/echo"
@@ -29,7 +28,14 @@ func Make() *echo.Echo {
 	// Esconde o cabeçalho do Echo
 	echoServer.HideBanner = true
 
+	echoServer.Use(middleware.CORS())
 	echoServer.Use(middleware.Recover())
+
+	if *debug {
+		echoServer.Debug = true
+		echoServer.Use(middleware.Logger())
+		log.EnableDebug(true)
+	}
 
 	return echoServer
 }
@@ -42,17 +48,10 @@ func ProvideEchoInstance(task func(e *echo.Echo)) {
 func Run() {
 	// For Heroku Work
 	porta := os.Getenv("PORT")
-	os.Setenv("debug", strconv.FormatBool(*debug))
 
 	if porta == "" {
 		porta = *port
 	}
 
-	if *debug {
-		echoServer.Use(middleware.Logger())
-		log.EnableDebug(true)
-	}
-
-	echoServer.Use(middleware.CORS())
 	echoServer.Logger.Fatal(echoServer.Start(":" + porta))
 }

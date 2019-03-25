@@ -8,8 +8,8 @@ import (
 func MiddlewareBindAndValidate(object interface{}) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) (err error) {
-
-			return BindAndValidate(c, object)
+			BindAndValidate(c, object)
+			return next(c)
 		}
 	}
 }
