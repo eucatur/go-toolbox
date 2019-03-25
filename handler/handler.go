@@ -36,3 +36,23 @@ func BindAndValidate(c echo.Context, obj interface{}) (err error) {
 
 	return
 }
+
+// Ok
+func Ok(c echo.Context, b interface{}) error {
+	return c.JSON(200, b)
+}
+
+// Error
+func Error(c echo.Context, b interface{}) error {
+	return c.JSON(400, b)
+}
+
+// Message
+func Message(c echo.Context, m string) error {
+	return c.JSON(200, &Handler{m})
+}
+
+// ErrorMessage
+func ErrorMessage(c echo.Context, m string) error {
+	return c.JSON(400, &Handler{m})
+}
