@@ -4,7 +4,7 @@ package handler
 import (
 	"github.com/eucatur/go-toolbox/log"
 
-	"bitbucket.org/eucatur/go-toolbox/lib/validator"
+	"github.com/eucatur/go-toolbox/validator"
 	"github.com/labstack/echo"
 	defaults "github.com/mcuadros/go-defaults"
 )
