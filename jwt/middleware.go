@@ -15,17 +15,23 @@ func MiddlewareForHeader(secret string) echo.MiddlewareFunc {
 
 			tokenRequest := c.Request().Header.Get(HEADER)
 
+			if secret == "" {
+				return &echo.HTTPError{Code: 400, Message: "Chave não informada"}
+			}
+
 			if tokenRequest == "" {
 				return &echo.HTTPError{Code: 401, Message: "Header Authorization não informado"}
 			}
 
-			claims, err = VerifyTokenAndGetClaims(strings.Replace(tokenRequest, "Bearer ", "", -1), secret)
+			token := strings.Replace(tokenRequest, "Bearer ", "", -1)
+
+			claims, err = VerifyTokenAndGetClaims(token, secret)
 
 			if err != nil {
 				return &echo.HTTPError{Code: 401, Message: "Token inválido"}
 			}
 
-			c.Set("claims", claims)
+			c.Set(CLAIMS, claims)
 
 			return next(c)
 		}

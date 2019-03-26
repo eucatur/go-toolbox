@@ -1,9 +1,9 @@
 {
-    "type": "mysql",
-    "host": "ensembldb.ensembl.org",
-    "port": 3306,
-    "user": "anonymous",
-    "password": "",
-    "database": "",
-    "max_open_connections": 0
+  "type": "mysql",
+  "host": "ensembldb.ensembl.org",
+  "port": 3306,
+  "user": "anonymous",
+  "password": "",
+  "database": "",
+  "max_open_connections": 0
 }
