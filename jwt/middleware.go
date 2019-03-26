@@ -31,7 +31,7 @@ func MiddlewareForHeader(secret string) echo.MiddlewareFunc {
 				return &echo.HTTPError{Code: 401, Message: "Token inválido"}
 			}
 
-			c.Set("claims", claims)
+			c.Set(CLAIMS, claims)
 
 			return next(c)
 		}

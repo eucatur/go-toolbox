@@ -6,7 +6,6 @@ import (
 
 	"github.com/eucatur/go-toolbox/validator"
 	"github.com/labstack/echo"
-	defaults "github.com/mcuadros/go-defaults"
 )
 
 const PARAMETERS = "parameters"
@@ -22,6 +21,7 @@ type Handler struct {
 // Like the name Validade and bind one struct with the validador golang lib
 func BindAndValidate(c echo.Context, obj interface{}) (err error) {
 	if err := c.Bind(obj); err != nil {
+		log.Error(err)
 		return c.JSON(422, &Handler{err.Error()})
 	}
 
@@ -30,7 +30,7 @@ func BindAndValidate(c echo.Context, obj interface{}) (err error) {
 		return c.JSON(422, err)
 	}
 
-	defaults.SetDefaults(obj)
+	// defaults.SetDefaults(obj)
 
 	c.Set(PARAMETERS, obj)
 

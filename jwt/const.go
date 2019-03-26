@@ -1,7 +1,8 @@
 package jwt
 
 const (
-	HEADER = "Authorization"
-	IDENTICATION = "jti"
-	GROUP        = "group"
+	HEADER         = "Authorization"
+	IDENTIFICATION = "jti"
+	CLAIMS         = "claims"
+	GROUP          = "group"
 )
