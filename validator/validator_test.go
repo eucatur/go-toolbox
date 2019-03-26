@@ -709,20 +709,24 @@ func Test_novalidate(t *testing.T) {
 }
 
 func Test_regex(t *testing.T) {
-	// regex correto
+	// correct regex
 	structRegex := struct {
-		Telefone string `json:"telefone" regex:"^[+]?[0-9]{8,}$" errmsg:"Please provide a valid phone number"`
+		Name  string `json:"name" noregex:"{{name}}!=''" regex:"^[a-zA-Z]{4,}$" errmsg:"The name must have more than four letters"`
+		Phone string `json:"phone" regex:"^[+]?[0-9]{8,}$" errmsg:"Please provide a valid phone number"`
 	}{
-		Telefone: "+5569999999999",
+		Name:  "Michael",
+		Phone: "+5569999999999",
 	}
 
 	test(t, expectedNil, structRegex)
 
-	// regex incorreto
-	structRegex.Telefone = "9999999"
+	// incorrect regex
+	structRegex.Name = "Ana"
+	structRegex.Phone = "9999999"
 
 	expected.Details = map[string]interface{}{
-		"telefone": "Please provide a valid phone number",
+		"name":  "The name must have more than four letters",
+		"phone": "Please provide a valid phone number",
 	}
 
 	test(t, expected, structRegex)

@@ -15,6 +15,7 @@ type vField struct {
 	TagRegex       string
 	TagErrMsg      string
 	TagNoValidate  string
+	TagNoRegex     string
 	Kind           reflect.Kind
 	Previous       *vField
 	Interface      interface{}

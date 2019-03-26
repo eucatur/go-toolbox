@@ -406,6 +406,28 @@ func validateVField(vf *vField, group string) interface{} {
 		return nil
 	}
 
+	// check regex
+	if !vf.isStruct() && vf.TagRegex != "" {
+		var (
+			condition = false
+			err       error
+		)
+
+		if vf.TagNoRegex != "" {
+			condition, err = prepareAndCheckCondition(vf, vf.TagNoRegex)
+		}
+
+		if err == nil && !condition {
+			valueString := vf.toString()
+			if len(valueString) > 0 && !regexp.MustCompile(vf.TagRegex).MatchString(valueString) {
+				if vf.TagErrMsg != "" {
+					return vf.TagErrMsg
+				}
+				return fmt.Sprintf(`Informe o conteúdo conforme a expressão regular: %s`, vf.TagRegex)
+			}
+		}
+	}
+
 	if vf.TagNoValidate != "" {
 		condition, err := prepareAndCheckCondition(vf, vf.TagNoValidate)
 		if err != nil || condition {
@@ -427,17 +449,6 @@ func validateVField(vf *vField, group string) interface{} {
 			return nil
 		}
 		return r
-	}
-
-	// validação da regex
-	if vf.TagRegex != "" {
-		valueString := vf.toString()
-		if len(valueString) > 0 && !regexp.MustCompile(vf.TagRegex).MatchString(valueString) {
-			if vf.TagErrMsg != "" {
-				return vf.TagErrMsg
-			}
-			return fmt.Sprintf(`Informe o conteúdo conforme a expressão regular: %s`, vf.TagRegex)
-		}
 	}
 
 	// faz as validações
