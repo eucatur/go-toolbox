@@ -17,6 +17,10 @@ Repositório com o objetivo de compartilhar a "caixa de ferramentas" que utiliza
 
 [database](https://github.com/eucatur/go-toolbox/tree/master/database) É um wrapper do [SQLx](https://github.com/jmoiron/sqlx) com o objetivo de entrar uma conexão com banco de dados (MySQL, Postgres ou SQLite) somente lhe indicando o arquivo env com os paramentros de conexão
 
+## format ##
+
+[format](https://github.com/eucatur/go-toolbox/tree/master/format) É um lib com funções de formatação para diversos tipos
+
 ## handler ##
 
 [handler](https://github.com/eucatur/go-toolbox/tree/master/handler) É um lib para criar funções utilizadas em diversos handlers no framework [Echo](https://github.com/labstack/echo) como a BindAndValidade para fazer o bind na struct e validar ela
