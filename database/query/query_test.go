@@ -3,17 +3,27 @@ package query
 import "testing"
 
 func TestNew(t *testing.T) {
-	var name = "Henrique"
+	var filter = struct {
+		Name  string
+		Phone string
+	}{
+		Name:  "Henrique",
+		Phone: "12345678",
+	}
 
-	q := New("SELECT * FROM Pessoas WHERE true")
+	q := New("SELECT * FROM Person WHERE ?", true)
 
-	q.And(name == "Henrique", " AND Pessoa.Name = ? ", name)
+	q.AddIf(filter.Name == "Henrique", " AND Person.Name = ? ", filter.Name)
+	q.AddIf(filter.Phone != "", " AND Person.Phone = ? ", filter.Phone)
+	q.Add(" ORDER BY Person.Id")
 
-	if q.String() != "SELECT * FROM Pessoas WHERE true AND Pessoa.Name = ? " {
+	fullQuery := `SELECT * FROM Person WHERE ? AND Person.Name = ?  AND Person.Phone = ?  ORDER BY Person.Id`
+
+	if q.String() != fullQuery {
 		t.Error("query err")
 	}
 
-	if len(q.Args()) != 1 {
+	if len(q.Args()) != 3 {
 		t.Error("args err")
 	}
 }
