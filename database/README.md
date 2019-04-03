@@ -1,4 +1,4 @@
-# database.v2 #
+# database #
 
 É um wrapper do [SQLx](https://github.com/jmoiron/sqlx) com o objetivo de entrar uma conexão com banco de dados (MySQL, Postgres ou SQLite) somente lhe indicando o arquivo env com os paramentros de conexão
 
@@ -12,7 +12,7 @@ Use este parametro no env para alterar o máximo de conexoes simultaneas possív
 package main
 
 import (
-	"github.com/eucatur/go-toolbox/database.v2"
+	"github.com/eucatur/go-toolbox/database"
 )
 
 func main() {

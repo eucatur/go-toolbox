@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/eucatur/go-toolbox/database.v2"
+	"github.com/eucatur/go-toolbox/database"
 )
 
 func main() {
