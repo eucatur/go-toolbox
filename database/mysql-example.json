@@ -1,9 +1,9 @@
 {
-  "DB_TYPE":"mysql",
-  "DB_HOST":"",
-  "DB_PORT":"",
-  "DB_USER":"",
-  "DB_PASSWORD":"",
-  "DB_DATABASE":"",
-  "_MAX_OPEN_CONNS":""
+  "type": "mysql",
+  "host": "ensembldb.ensembl.org",
+  "port": 3306,
+  "user": "anonymous",
+  "password": "",
+  "database": "",
+  "max_open_connections": 0
 }

@@ -1,10 +1,10 @@
 {
-  "DB_TYPE":"postgres",
-  "DB_HOST":"",
-  "DB_PORT":"",
-  "DB_USER":"",
-  "DB_PASSWORD":"",
-  "DB_DATABASE":"",
-  "DB_SSLMODE": "disable",
-  "_MAX_OPEN_CONNS":""
+  "type": "postgres",
+  "host": "hh-pgsql-public.ebi.ac.uk",
+  "port": 5432,
+  "user": "reader",
+  "password": "NWDMCE5xdipIjRrp",
+  "database": "pfmegrnargs",
+  "ssl_mode": "disable",
+  "max_open_connections": 0
 }

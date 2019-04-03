@@ -1,21 +1,21 @@
 package main
 
 import (
-	"github.com/eucatur/go-toolbox/database"
+	"fmt"
+
+	"github.com/eucatur/go-toolbox/database.v2"
 )
 
 func main() {
-	db, err := database.ConfigFromEnvFile("../sqlite3-example.json")
-
-	if err != nil {
-		panic(err)
-	}
+	db := database.MustGetByFile("../sqlite3-example.json")
 
 	var now string
 
-	err = db.Get(&now, `select now()`)
+	err := db.Get(&now, `select current_timestamp;`)
 
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("current_timestamp:", now)
 }
