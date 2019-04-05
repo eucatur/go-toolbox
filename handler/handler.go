@@ -43,8 +43,8 @@ func Ok(c echo.Context, b interface{}) error {
 }
 
 // Error
-func Error(c echo.Context, b interface{}) error {
-	return c.JSON(400, b)
+func Error(e error) error {
+	return echo.NewHTTPError(400, e)
 }
 
 // Message
