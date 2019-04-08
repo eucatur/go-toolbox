@@ -44,8 +44,13 @@ Repositório com o objetivo de compartilhar a "caixa de ferramentas" que utiliza
 [path](https://github.com/eucatur/go-toolbox/tree/master/path) É uma lib com funções relacionadas à diretórios
 
 ## signature ##
-[signature](https://github.com/eucatur/go-toolbox/tree/master/signature) É uma lib com funções relacionadas à diretórios
+[signature](https://github.com/eucatur/go-toolbox/tree/master/signature) É uma lib para criar a struct de Signature para SOAP do XML
 
+## template ##
+[template](https://github.com/eucatur/go-toolbox/tree/master/template) É uma lib onde se manda o template e a struct e ele retorna o template compilado com as váriavéis
+
+## validator ##
+[validator](https://github.com/eucatur/go-toolbox/tree/master/validator) É uma lib para validação dos dados de uma struct, com várias validações, como CPF, CNPJ, email e etc
 
 ## viacep ##
 [viacep](https://github.com/eucatur/go-toolbox/tree/master/viacep) É uma lib que retorna informações de localidade ao informar o CEP
