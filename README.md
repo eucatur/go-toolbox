@@ -49,6 +49,9 @@ Repositório com o objetivo de compartilhar a "caixa de ferramentas" que utiliza
 ## template ##
 [template](https://github.com/eucatur/go-toolbox/tree/master/template) É uma lib onde se manda o template e a struct e ele retorna o template compilado com as váriavéis
 
+## text ##
+[text](https://github.com/eucatur/go-toolbox/tree/master/text) É uma lib para manipulação de STRINGS
+
 ## validator ##
 [validator](https://github.com/eucatur/go-toolbox/tree/master/validator) É uma lib para validação dos dados de uma struct, com várias validações, como CPF, CNPJ, email e etc
 
