@@ -35,7 +35,13 @@ Repositório com o objetivo de compartilhar a "caixa de ferramentas" que utiliza
 
 ## log ##
 
-[log](https://github.com/eucatur/go-toolbox/tree/master/log) é uma lib para lidar com log, para log em arquivo ou no terminal com a linha do arquivo com o erro 
+[log](https://github.com/eucatur/go-toolbox/tree/master/log) É uma lib para lidar com log, para log em arquivo ou no terminal com a linha do arquivo com o erro 
 
 ## path ##
-[path](https://github.com/eucatur/go-toolbox/tree/master/path) é uma lib com funções relacionadas à diretórios
+[path](https://github.com/eucatur/go-toolbox/tree/master/path) É uma lib com funções relacionadas à diretórios
+
+## viacep ##
+[viacep](https://github.com/eucatur/go-toolbox/tree/master/viacep) É uma lib que retorna informações de localidade ao informar o CEP
+
+## ibge ##
+[ibge](https://github.com/eucatur/go-toolbox/tree/master/ibge) É uma lib responsável por retornar informações sobre localidade vindas do IBGE
