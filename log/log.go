@@ -37,9 +37,14 @@ func Error(e error) {
 	color.Unset()
 }
 
-// Println For use the same Println for the standart log lib
-func Println(a ...interface{}) {
-	log.Println(a)
+// Println use the same Println for the standart log lib
+func Println(i ...interface{}) {
+	log.Println(i)
+}
+
+// Fatal use the same Fatal for the standart log lib
+func Fatal(i ...interface{}) {
+	log.Fatal(i)
 }
 
 // Debug is a function for print in terminal if the variable debug it's true
