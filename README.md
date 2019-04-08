@@ -13,6 +13,10 @@ Repositório com o objetivo de compartilhar a "caixa de ferramentas" que utiliza
 
 [cookie](https://github.com/eucatur/go-toolbox/tree/master/cookie) É um lib para adicionar e deletar cookie no framework [Echo](https://github.com/labstack/echo)
 
+## crypt ##
+
+[crypt](https://github.com/eucatur/go-toolbox/tree/master/crypt) É um lib para ajudar na geração de hashs no Golang
+
 ## database ##
 
 [database](https://github.com/eucatur/go-toolbox/tree/master/database) É um wrapper do [SQLx](https://github.com/jmoiron/sqlx) com o objetivo de entrar uma conexão com banco de dados (MySQL, Postgres ou SQLite) somente lhe indicando o arquivo env com os paramentros de conexão
