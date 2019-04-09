@@ -4,6 +4,7 @@ package env
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -56,55 +57,65 @@ func MustSetByJSONFile(filePath string) {
 	}
 }
 
-// Get search for a value between the environment variables
-func Get(key string) string {
+// String search for a value between the environment variables
+func String(key string) string {
 	return os.Getenv(key)
 }
 
-// GetInt search for a value between the environment
+// Int search for a value between the environment
 // variables and convert to int
-func GetInt(key string) (int, error) {
-	return strconv.Atoi(Get(key))
+func Int(key string) (int, error) {
+	return strconv.Atoi(String(key))
 }
 
-// MustGetInt search for a value between the environment
+// MustInt search for a value between the environment
 // variables, convert to int and generates a panic in case of error
-func MustGetInt(key string) int {
-	value, err := GetInt(key)
+func MustInt(key string) int {
+	value, err := Int(key)
 	if err != nil {
 		panic(err)
 	}
 	return value
 }
 
-// GetInt64 search for a value between the environment variables
+// Int64 search for a value between the environment variables
 // and convert to int64
-func GetInt64(key string) (int64, error) {
-	return strconv.ParseInt(Get(key), 10, 64)
+func Int64(key string) (int64, error) {
+	return strconv.ParseInt(String(key), 10, 64)
 }
 
-// MustGetInt64 search for a value between the environment
+// MustInt64 search for a value between the environment
 // variables, convert to int64 and generates a panic in case of error
-func MustGetInt64(key string) int64 {
-	value, err := GetInt64(key)
+func MustInt64(key string) int64 {
+	value, err := Int64(key)
 	if err != nil {
 		panic(err)
 	}
 	return value
 }
 
-// GetFloat64 earch for a value between the environment variables
+// Float64 earch for a value between the environment variables
 // and convert to float64
-func GetFloat64(key string) (float64, error) {
-	return strconv.ParseFloat(Get(key), 64)
+func Float64(key string) (float64, error) {
+	return strconv.ParseFloat(String(key), 64)
 }
 
-// MustGetFloat64 search for a value between the environment
+// MustFloat64 search for a value between the environment
 // variables, convert to float64 and generates a panic in case of error
-func MustGetFloat64(key string) float64 {
-	value, err := GetFloat64(key)
+func MustFloat64(key string) float64 {
+	value, err := Float64(key)
 	if err != nil {
 		panic(err)
 	}
 	return value
+}
+
+// MustString search for a value between the environment
+// variables generates a panic in case of error
+func MustString(key string) (value string) {
+	value = os.Getenv(key)
+	if len(value) == 0 {
+		panic(errors.New("The environment variable [" + key + "] is not set"))
+	}
+	return
 }
