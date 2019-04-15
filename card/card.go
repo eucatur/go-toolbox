@@ -10,7 +10,6 @@ import (
 
 // Mask Hide card information
 func Mask(cardNumber string) (cardMask string, err error) {
-	cardNumber = text.OnlyNumbers(cardNumber)
 	if !Valid(cardNumber) {
 		err = errors.New("Invalid Card")
 		return
@@ -24,7 +23,8 @@ func Mask(cardNumber string) (cardMask string, err error) {
 }
 
 func Valid(cardNumber string) bool {
+	cardNumber = text.OnlyNumbers(cardNumber)
 	l := len(cardNumber)
 
-	return l > 15 && l < 19
+	return l > 14 && l < 19
 }
