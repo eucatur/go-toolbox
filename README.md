@@ -54,6 +54,9 @@ Repositório com o objetivo de compartilhar a "caixa de ferramentas" que utiliza
 ## path ##
 [path](https://github.com/eucatur/go-toolbox/tree/master/path) É uma lib com funções relacionadas à diretórios
 
+## platform ##
+[platform](https://github.com/eucatur/go-toolbox/tree/master/platform) É uma lib para identificar a platforma do Header UserAgent do HTTP
+
 ## signature ##
 [signature](https://github.com/eucatur/go-toolbox/tree/master/signature) É uma lib para criar a struct de Signature para SOAP do XML
 
