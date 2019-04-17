@@ -22,9 +22,10 @@ func Mask(cardNumber string) (cardMask string, err error) {
 	return
 }
 
+// Valid method to validate credit card
 func Valid(cardNumber string) bool {
 	cardNumber = text.OnlyNumbers(cardNumber)
 	l := len(cardNumber)
 
-	return l > 14 && l < 19
+	return l > 13 && l < 19
 }
