@@ -122,7 +122,7 @@ func MustString(key string) (value string) {
 
 // Bool earch for a value between the environment variables and convert to boolean
 func Bool(key string) (bool, error) {
-	return strconv.ParseBool(key)
+	return strconv.ParseBool(String(key))
 }
 
 // MustBool search for a value between the environment variables, convert to boolean and generates a panic in case of error
