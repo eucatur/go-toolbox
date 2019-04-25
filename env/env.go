@@ -120,14 +120,12 @@ func MustString(key string) (value string) {
 	return
 }
 
-// Float64 earch for a value between the environment variables
-// and convert to float64
+// Bool earch for a value between the environment variables and convert to boolean
 func Bool(key string) (bool, error) {
 	return strconv.ParseBool(key)
 }
 
-// MustFloat64 search for a value between the environment
-// variables, convert to float64 and generates a panic in case of error
+// MustBool search for a value between the environment variables, convert to boolean and generates a panic in case of error
 func MustBool(key string) bool {
 	value, err := Bool(key)
 	if err != nil {
