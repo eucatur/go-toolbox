@@ -2,6 +2,7 @@
 package text
 
 import (
+	"math/rand"
 	"regexp"
 	"unicode"
 
@@ -30,4 +31,18 @@ func Normalize(str string) (string, error) {
 	transf := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	data, _, err := transform.String(transf, str)
 	return data, err
+}
+
+// RandomCharacters gerar caracteres alertórios com base na quantidade informada
+//
+// str := RandomCharacters(4) // XwpT
+//
+func RandomCharacters(numberOfCharacters int) string {
+	letterBytes := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+	b := make([]byte, numberOfCharacters)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
 }
