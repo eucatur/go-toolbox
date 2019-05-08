@@ -2,6 +2,8 @@
 package handler
 
 import (
+	"reflect"
+
 	"github.com/eucatur/go-toolbox/log"
 
 	"github.com/eucatur/go-toolbox/validator"
@@ -20,6 +22,9 @@ type Handler struct {
 
 // Like the name Validade and bind one struct with the validador golang lib
 func BindAndValidate(c echo.Context, obj interface{}) (err error) {
+	obj = reflect.ValueOf(obj).Elem().Interface()
+	obj = reflect.New(reflect.TypeOf(obj)).Interface()
+
 	if err := c.Bind(obj); err != nil {
 		log.Error(err)
 		return c.JSON(422, &Handler{err.Error()})
