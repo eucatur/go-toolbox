@@ -46,3 +46,10 @@ func RandomCharacters(numberOfCharacters int) string {
 	}
 	return string(b)
 }
+
+// RemoveAccents is a functions for remove accents
+func RemoveAccents(s string) (r string) {
+	r, _ = Normalize(s)
+	r = regexp.MustCompile(`[^\w]|\s`).ReplaceAllString(r, "")
+	return
+}
