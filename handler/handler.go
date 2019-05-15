@@ -8,6 +8,7 @@ import (
 
 	"github.com/eucatur/go-toolbox/validator"
 	"github.com/labstack/echo"
+	"github.com/mcuadros/go-defaults"
 )
 
 const PARAMETERS = "parameters"
@@ -35,7 +36,7 @@ func BindAndValidate(c echo.Context, obj interface{}) (err error) {
 		return c.JSON(422, err)
 	}
 
-	// defaults.SetDefaults(obj)
+	defaults.SetDefaults(obj)
 
 	c.Set(PARAMETERS, obj)
 
