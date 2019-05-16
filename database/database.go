@@ -75,6 +75,9 @@ func connect(config dbConfig) (*sqlx.DB, error) {
 		db.SetMaxOpenConns(config.MaxOpenConnections)
 	}
 
+	db.SetMaxIdleConns(0)
+	db.SetConnMaxLifetime(-1)
+
 	connections[config.FilePath] = db
 	return db, nil
 }
