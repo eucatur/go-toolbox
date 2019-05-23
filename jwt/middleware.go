@@ -3,6 +3,7 @@ package jwt
 import (
 	"strings"
 
+	"github.com/eucatur/go-toolbox/log"
 	"github.com/labstack/echo"
 )
 
@@ -19,15 +20,16 @@ func MiddlewareForHeader(secret string) echo.MiddlewareFunc {
 				return &echo.HTTPError{Code: 400, Message: "Chave não informada"}
 			}
 
-			if tokenRequest == "" {
-				return &echo.HTTPError{Code: 401, Message: "Header Authorization não informado"}
-			}
-
 			token := strings.Replace(tokenRequest, "Bearer ", "", -1)
+
+			if token == "" {
+				return &echo.HTTPError{Code: 401, Message: "Header Authorization não informado corretamente"}
+			}
 
 			claims, err = VerifyTokenAndGetClaims(token, secret)
 
 			if err != nil {
+				log.Error(err)
 				return &echo.HTTPError{Code: 401, Message: "Token inválido"}
 			}
 
