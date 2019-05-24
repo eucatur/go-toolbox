@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
+	"syscall"
 	"time"
 
 	"github.com/fatih/color"
@@ -69,14 +71,14 @@ func File(file, text string) error {
 
 	if err != nil {
 
-		err = os.Mkdir(path, os.FileMode(511))
+		err = os.Mkdir(path, os.ModePerm)
 
 		if err != nil {
 			return err
 		}
 	}
 
-	f, err := os.OpenFile(path+"/"+file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(path+"/"+file, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
 
 	if err != nil {
 		return err
@@ -85,4 +87,33 @@ func File(file, text string) error {
 	f.WriteString(time.Now().Format("2006-02-01 15:04:05") + " | " + text + "\n")
 	f.Close()
 	return nil
+}
+
+func createFileIfNotExists(filePath string) (f *os.File) {
+	dirName := filepath.Dir(filePath)
+
+	err := os.MkdirAll(dirName, os.ModePerm)
+
+	if err != nil {
+		log.Fatalf("Error create path: %v", err)
+	}
+
+	f, err = os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	if err != nil {
+		log.Fatalf("Error create file: %v", err)
+	}
+
+	return
+}
+
+//SetOutputFiles set a new path for logs
+func SetOutputFiles(outfilePath, errfilePath string) {
+	outFile := createFileIfNotExists(outfilePath)
+	errFile := createFileIfNotExists(errfilePath)
+
+	defer outFile.Close()
+	defer errFile.Close()
+
+	syscall.Dup2(int(outFile.Fd()), 1) /* -- stdout */
+	syscall.Dup2(int(errFile.Fd()), 2) /* -- stderr */
 }
