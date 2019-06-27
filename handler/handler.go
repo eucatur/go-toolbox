@@ -26,14 +26,20 @@ func BindAndValidate(c echo.Context, obj interface{}) (err error) {
 	obj = reflect.ValueOf(obj).Elem().Interface()
 	obj = reflect.New(reflect.TypeOf(obj)).Interface()
 
-	if err := c.Bind(obj); err != nil {
+	err = c.Bind(obj)
+	if err != nil {
 		log.Error(err)
 		return c.JSON(422, &Handler{err.Error()})
 	}
 
-	if err := validator.Validate(obj); err != nil {
-		log.Error(err)
-		return c.JSON(422, err)
+	vErr := validator.Validate(obj)
+	if vErr != nil {
+		log.Error(vErr)
+		err = c.JSON(422, vErr)
+		if err != nil {
+			return
+		}
+		return vErr
 	}
 
 	defaults.SetDefaults(obj)
