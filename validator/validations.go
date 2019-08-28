@@ -9,6 +9,7 @@ import (
 
 	"github.com/eucatur/go-toolbox/validator/cnpj"
 	"github.com/eucatur/go-toolbox/validator/cpf"
+	"github.com/eucatur/go-toolbox/validator/email"
 )
 
 var bpeRgx = map[string]string{
@@ -262,8 +263,7 @@ func vEnum(vf vField) string {
 
 func vEmail(vf vField) string {
 	if vf.isString() && vf.toString() != "" {
-		rgx := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$`)
-		if !rgx.MatchString(vf.toString()) {
+		if !email.Valido(vf.toString()) {
 			return "Informe um e-mail válido"
 		}
 	}
