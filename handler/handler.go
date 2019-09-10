@@ -54,9 +54,20 @@ func Ok(c echo.Context, b interface{}) error {
 	return c.JSON(200, b)
 }
 
-// Error
+// Created ...
+func Created(b interface{}) (err error) {
+	switch value := b.(type) {
+	case int, int32, int64:
+		return echo.NewHTTPError(201, echo.Map{"id": value})
+	case []struct{}:
+		return echo.NewHTTPError(201, value)
+	}
+	return
+}
+
+// Error ...
 func Error(e error) error {
-	return echo.NewHTTPError(400, e)
+	return echo.NewHTTPError(400, e.Error())
 }
 
 // Message
