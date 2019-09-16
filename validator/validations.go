@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	gotooboxtime "github.com/eucatur/go-toolbox/time"
 	"github.com/eucatur/go-toolbox/validator/cnpj"
 	"github.com/eucatur/go-toolbox/validator/cpf"
 	"github.com/eucatur/go-toolbox/validator/email"
@@ -74,6 +75,15 @@ func vRequired(vf vField) string {
 	}
 	if vf.isSlice() && vf.len() == 0 {
 		return "Informe ao menos um elemento para esse campo (array)"
+	}
+	if vf.isTimeEUA() && vf.toTimeEUA().IsZero() {
+		return "Informe um data no formato " + gotooboxtime.TimeEUALayout
+	}
+	if vf.isTimeCard() && vf.toTimeCard().IsZero() {
+		return "Informe um data no formato " + gotooboxtime.TimeCardLayout
+	}
+	if vf.isTimestamp() && vf.toTimestamp().IsZero() {
+		return "Informe um data no formato " + gotooboxtime.TimestampLayout
 	}
 	return ""
 }

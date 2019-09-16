@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	gotoolboxtime "github.com/eucatur/go-toolbox/time"
 )
 
 const (
@@ -318,8 +320,18 @@ func toVField(previous *vField, a interface{}, tags *reflect.StructTag, name str
 		vf.TagNoValidate = tags.Get(tagNoValidate)
 	}
 
+	_, isTimeEUA := a.(gotoolboxtime.TimeEUA)
+	_, isTimeCard := a.(gotoolboxtime.TimeCard)
+	_, isTimestamp := a.(gotoolboxtime.Timestamp)
+
+	switch {
+	case isTimeEUA, isTimeCard, isTimestamp:
+		vf.Kind = reflect.Invalid
+		vf.Interface = a
+
 	// quando é struct faz recursão em todos os campos e para a função
-	if t.Kind() == reflect.Struct {
+	case t.Kind() == reflect.Struct:
+
 		vfs := []*vField{}
 
 		for i := 0; i < t.NumField(); i++ {
@@ -341,11 +353,10 @@ func toVField(previous *vField, a interface{}, tags *reflect.StructTag, name str
 
 		vf.Interface = vfs
 		return vf
-	}
 
 	// quando é um slice faz recursão em todos o elementos e salva como o Interface
 	// dele (passam as ser os "filhos")
-	if t.Kind() == reflect.Slice {
+	case t.Kind() == reflect.Slice:
 		vfs := []*vField{}
 
 		if v.Len() != 0 {
@@ -359,7 +370,8 @@ func toVField(previous *vField, a interface{}, tags *reflect.StructTag, name str
 		}
 
 		vf.Interface = vfs
-	} else {
+
+	default:
 		// define o interface com o próprio valor
 		vf.Interface = a
 	}
