@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+
+	gotoolboxtime "github.com/eucatur/go-toolbox/time"
 )
 
 type vField struct {
@@ -239,6 +241,30 @@ func (v vField) toFloat64() float64 {
 	return value
 }
 
+func (v vField) toTimeEUA() gotoolboxtime.TimeEUA {
+	value, ok := v.Interface.(gotoolboxtime.TimeEUA)
+	if !ok {
+		panic("time (EUA) converter error")
+	}
+	return value
+}
+
+func (v vField) toTimeCard() gotoolboxtime.TimeCard {
+	value, ok := v.Interface.(gotoolboxtime.TimeCard)
+	if !ok {
+		panic("time (card) converter error")
+	}
+	return value
+}
+
+func (v vField) toTimestamp() gotoolboxtime.Timestamp {
+	value, ok := v.Interface.(gotoolboxtime.Timestamp)
+	if !ok {
+		panic("timestamp converter error")
+	}
+	return value
+}
+
 func (v vField) isBool() bool {
 	return v.Kind == reflect.Bool
 }
@@ -265,4 +291,19 @@ func (v vField) isStruct() bool {
 
 func (v vField) isFloat64() bool {
 	return v.Kind == reflect.Float64
+}
+
+func (v vField) isTimeEUA() bool {
+	_, ok := v.Interface.(gotoolboxtime.TimeEUA)
+	return ok
+}
+
+func (v vField) isTimeCard() bool {
+	_, ok := v.Interface.(gotoolboxtime.TimeCard)
+	return ok
+}
+
+func (v vField) isTimestamp() bool {
+	_, ok := v.Interface.(gotoolboxtime.Timestamp)
+	return ok
 }

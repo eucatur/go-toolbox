@@ -2,7 +2,9 @@ package validator
 
 import (
 	"testing"
+	"time"
 
+	toolboxtime "github.com/eucatur/go-toolbox/time"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,11 +61,17 @@ func Test_msg(t *testing.T) {
 func Test_required(t *testing.T) {
 	// required correto
 	structRequired := struct {
-		Name  string   `json:"name" validate:"required" errmsg:"Enter the name"`
-		Names []string `json:"names" validate:"required" errmsg:"Enter the name or more"`
+		Name      string                `json:"name" validate:"required" errmsg:"Enter the name"`
+		Names     []string              `json:"names" validate:"required" errmsg:"Enter the name or more"`
+		TimeEUA   toolboxtime.TimeEUA   `json:"time_eua" validate:"required" errmsg:"Enter a timeEUA"`
+		TimeCard  toolboxtime.TimeCard  `json:"time_card" validate:"required" errmsg:"Enter a timeCard"`
+		Timestamp toolboxtime.Timestamp `json:"timestamp" validate:"required" errmsg:"Enter a timestamp"`
 	}{
-		Name:  "Jon",
-		Names: []string{"Jon", "Sam"},
+		Name:      "Jon",
+		Names:     []string{"Jon", "Sam"},
+		TimeEUA:   toolboxtime.TimeEUA{Time: time.Now()},
+		TimeCard:  toolboxtime.TimeCard{Time: time.Now()},
+		Timestamp: toolboxtime.Timestamp{Time: time.Now()},
 	}
 
 	test(t, expectedNil, structRequired)
@@ -71,10 +79,16 @@ func Test_required(t *testing.T) {
 	// required incorreto
 	structRequired.Name = ""
 	structRequired.Names = []string{}
+	structRequired.TimeEUA = toolboxtime.TimeEUA{}
+	structRequired.TimeCard = toolboxtime.TimeCard{}
+	structRequired.Timestamp = toolboxtime.Timestamp{}
 
 	expected.Details = map[string]interface{}{
-		"name":  "Enter the name",
-		"names": "Enter the name or more",
+		"name":      "Enter the name",
+		"names":     "Enter the name or more",
+		"time_eua":  "Enter a timeEUA",
+		"time_card": "Enter a timeCard",
+		"timestamp": "Enter a timestamp",
 	}
 
 	test(t, expected, structRequired)
