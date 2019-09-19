@@ -63,3 +63,13 @@ func Round(value float64, precision int) float64 {
 
 	return round / pow
 }
+
+// ToInt - Realiza a conversão de valor em float para int considerando casas deciamis
+// exemplo
+// value = 18.9 irá retonar 1890
+func ToInt(value float64) int {
+	if value < 0 {
+		return int(value*100 - 0.5)
+	}
+	return int(value*100 + 0.5)
+}
