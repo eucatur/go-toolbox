@@ -23,6 +23,10 @@ func AsTextInBR(d time.Duration) string {}
 
 func Reais(valor int64) string {}
 
+func Round(value float64, precision int) float64 {}
+
+func ToInt(value float64) int {}
+
 ## phone ##
 
 func Short(phone string) string {}
