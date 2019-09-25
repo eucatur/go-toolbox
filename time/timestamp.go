@@ -11,6 +11,11 @@ const TimestampLayout = "2006-01-02 15:04:05"
 
 type Timestamp struct{ time.Time }
 
+// NowTimestamp returns the current local timestamp.
+func NowTimestamp() Timestamp {
+	return Timestamp{Time: time.Now()}
+}
+
 func (t Timestamp) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, t.String())), nil
 }
@@ -52,4 +57,11 @@ func (t Timestamp) String() string {
 		return ""
 	}
 	return t.Format(TimestampLayout)
+}
+
+// AddDate returns the time corresponding to adding the given number of years, months, and days to t. For example, AddDate(-1, 2, 3) applied to January 1, 2011 returns March 4, 2010.
+// AddDate normalizes its result in the same way that Date does, so, for example, adding one month to October 31 yields December 1, the normalized form for November 31.
+func (t Timestamp) AddDate(years int, months int, days int) Timestamp {
+	t.Time = t.Time.AddDate(years, months, days)
+	return t
 }
