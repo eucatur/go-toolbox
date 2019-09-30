@@ -84,7 +84,7 @@ func File(file, text string) error {
 		return err
 	}
 
-	f.WriteString(time.Now().Format("2006-02-01 15:04:05") + " | " + text + "\n")
+	f.WriteString(time.Now().Format("2006-01-02 15:04:05") + " | " + text + "\n")
 	f.Close()
 	return nil
 }
