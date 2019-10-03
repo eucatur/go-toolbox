@@ -54,14 +54,13 @@ func RemoveAccents(s string) (r string) {
 	return
 }
 
-
 // PadRight - Complementa com determinado valor a quantidade que falta para inteirar uma string desejada
 // uma string deve ser abxx e só vem  ab com esta função irá inserir o caracter desejado para complementar
 // Aplicação: PadRight("ab", "x", 4) irá retornar abxx
 func PadRight(str, pad string, lenght int) string {
 	for {
 		str += pad
-		if len(str) > lenght {
+		if len(str) == lenght {
 			return str[0:lenght]
 		}
 	}
@@ -73,7 +72,7 @@ func PadRight(str, pad string, lenght int) string {
 func PadLeft(str, pad string, lenght int) string {
 	for {
 		str = pad + str
-		if len(str) > lenght {
+		if len(str) == lenght {
 			return str[0:lenght]
 		}
 	}
