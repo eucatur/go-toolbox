@@ -2,11 +2,13 @@
 package log
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
 	"time"
 
@@ -65,20 +67,32 @@ func Debugf(format string, v ...interface{}) {
 
 // File save ou create a new log file with errors
 func File(file, text string) error {
-	path := "logs"
+	if len(file) < 1 {
+		return errors.New("invalid file name")
+	}
 
-	_, err := os.Stat(path)
+	path := "logs/"
+	if file[0:1] == "/" {
+		path += file[1:]
+	} else {
+		path += file
+	}
+
+	pathSplited := strings.Split(path, "/")
+	folders := strings.Join(pathSplited[0:len(pathSplited)-1], "/")
+
+	_, err := os.Stat(folders)
 
 	if err != nil {
 
-		err = os.Mkdir(path, os.ModePerm)
+		err = os.MkdirAll(folders, os.ModePerm)
 
 		if err != nil {
 			return err
 		}
 	}
 
-	f, err := os.OpenFile(path+"/"+file, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
 
 	if err != nil {
 		return err
