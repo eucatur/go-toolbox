@@ -2,7 +2,9 @@ package api
 
 import (
 	"flag"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/eucatur/go-toolbox/log"
 	"github.com/labstack/echo"
@@ -54,4 +56,37 @@ func Run() {
 	}
 
 	echoServer.Logger.Fatal(echoServer.Start(":" + porta))
+}
+
+func UseCustomHTTPErrorHandler() {
+	echoServer.HTTPErrorHandler = CustomHTTPErrorHandler
+}
+
+func CustomHTTPErrorHandler(err error, c echo.Context) {
+	if err == nil {
+		return
+	}
+
+	defer log.File(time.Now().Format("errors/2006/01/02/15h.log"), err.Error())
+
+	var (
+		code = http.StatusInternalServerError
+		msg  interface{}
+	)
+
+	msg = echo.Map{"message": "Erro interno no servidor."}
+
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+		msg = he.Message
+	}
+
+	// Send response
+	if !c.Response().Committed {
+		if c.Request().Method == echo.HEAD { // Issue #608
+			err = c.NoContent(code)
+		} else {
+			err = c.JSON(code, msg)
+		}
+	}
 }
