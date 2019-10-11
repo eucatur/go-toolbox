@@ -58,6 +58,10 @@ func Run() {
 	echoServer.Logger.Fatal(echoServer.Start(":" + porta))
 }
 
+func Use(middleware ...echo.MiddlewareFunc) {
+	echoServer.Use(middleware...)
+}
+
 func UseCustomHTTPErrorHandler() {
 	echoServer.HTTPErrorHandler = CustomHTTPErrorHandler
 }
