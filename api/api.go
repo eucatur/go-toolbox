@@ -2,6 +2,7 @@ package api
 
 import (
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -67,22 +68,23 @@ func UseCustomHTTPErrorHandler() {
 }
 
 func CustomHTTPErrorHandler(err error, c echo.Context) {
-	if err == nil {
-		return
-	}
-
-	defer log.File(time.Now().Format("errors/2006/01/02/15h.log"), err.Error())
-
 	var (
 		code = http.StatusInternalServerError
 		msg  interface{}
 	)
 
-	msg = echo.Map{"message": "Erro interno no servidor."}
-
 	if he, ok := err.(*echo.HTTPError); ok {
 		code = he.Code
 		msg = he.Message
+		if he.Internal != nil {
+			msg = fmt.Sprintf("%v, %v", err, he.Internal)
+		}
+	} else {
+		msg = http.StatusText(code)
+	}
+
+	if _, ok := msg.(string); ok {
+		msg = echo.Map{"message": msg}
 	}
 
 	// Send response
@@ -92,5 +94,10 @@ func CustomHTTPErrorHandler(err error, c echo.Context) {
 		} else {
 			err = c.JSON(code, msg)
 		}
+		if err != nil {
+			c.Echo().Logger.Error(err)
+		}
+	} else {
+		log.File(time.Now().Format("errors/2006/01/02/15h.log"), err.Error())
 	}
 }
