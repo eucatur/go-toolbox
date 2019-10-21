@@ -57,6 +57,9 @@ Repositório com o objetivo de compartilhar a "caixa de ferramentas" que utiliza
 ## platform ##
 [platform](https://github.com/eucatur/go-toolbox/tree/master/platform) É uma lib para identificar a platforma do Header UserAgent do HTTP
 
+## redis ##
+[redis](https://github.com/eucatur/go-toolbox/tree/master/redis) cache regis é um wrapper do [redigo](https://github.com/gomodule/redigo) uma lib de cache utilizando o REDIS, basicamente tem somente o método SET e GET 
+
 ## signature ##
 [signature](https://github.com/eucatur/go-toolbox/tree/master/signature) É uma lib para criar a struct de Signature para SOAP do XML
 
