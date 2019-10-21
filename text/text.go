@@ -4,6 +4,7 @@ package text
 import (
 	"math/rand"
 	"regexp"
+	"strings"
 	"unicode"
 
 	"golang.org/x/text/runes"
@@ -76,4 +77,9 @@ func PadLeft(str, pad string, lenght int) string {
 			return str[0:lenght]
 		}
 	}
+}
+
+// StringIsEmptyOrWhiteSpace função responsável por verificar string completamente vazia
+func StringIsEmptyOrWhiteSpace(str string) bool {
+	return len(strings.TrimSpace(str)) == 0
 }
