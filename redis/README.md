@@ -1,3 +1,10 @@
+# redis #
+
+cache regis é um wrapper do [redigo](https://github.com/gomodule/redigo) uma lib de cache utilizando o REDIS, basicamente tem somente o método SET e GET 
+
+## Exemplo ##
+
+```code
 package main
 
 import (
@@ -52,3 +59,5 @@ func main() {
 		return
 	}
 }
+
+```

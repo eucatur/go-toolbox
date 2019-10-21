@@ -1,20 +1,19 @@
-package main
+package redis
 
 import (
 	"encoding/json"
-	"log"
-
-	"github.com/eucatur/go-toolbox/redis"
+	"testing"
+	"time"
 )
 
-func main() {
-	client := redis.Client{
+func TestFull(t *testing.T) {
+	key := "KEY"
+	expirationSeconds := 1
+
+	client := Client{
 		Host: "localhost",
 		Port: 6379,
 	}
-
-	key := "KEY"
-	expirationSeconds := 1
 
 	type Person struct {
 		Name  string `json:"name"`
@@ -28,13 +27,13 @@ func main() {
 
 	vJSON, err := json.Marshal(personIn)
 	if err != nil {
-		log.Println(err)
+		t.Error(err)
 		return
 	}
 
 	err = client.Set(key, string(vJSON), expirationSeconds)
 	if err != nil {
-		log.Println(err)
+		t.Error(err)
 		return
 	}
 
@@ -42,13 +41,27 @@ func main() {
 
 	data, ok := client.MustGet(key)
 	if !ok {
-		log.Println(err)
+		t.Error("Não foi possivel obter o cache.")
 		return
 	}
 
 	err = json.Unmarshal([]byte(data), &personOut)
 	if err != nil {
-		log.Println(err)
+		t.Error(err)
 		return
 	}
+
+	if personIn != personOut {
+		t.Error("O valor obtido é diferente do informado.")
+		return
+	}
+
+	time.Sleep(time.Duration(expirationSeconds) * time.Second)
+
+	data, ok = client.MustGet(key)
+	if ok {
+		t.Error("O cache não expirou.")
+		return
+	}
+
 }
