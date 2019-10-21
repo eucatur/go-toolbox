@@ -1,29 +1,54 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
-	"time"
 
-	"github.com/eucatur/go-toolbox/cache"
+	"github.com/eucatur/go-toolbox/redis"
 )
 
 func main() {
-	key := "foo"
-	value := "bar"
-
-	// The default duration in cache is 1 minute
-	cache.Set(key, value)
-
-	// Add on cache with 5 minutes
-	cache.Set(key, value, 5*time.Minute)
-
-	v, found := cache.Get(key)
-
-	if v != nil {
-		value = v.(string)
+	client := redis.Client{
+		Host: "localhost",
+		Port: 6379,
 	}
 
-	if found {
-		log.Println("Found: ", value)
+	key := "KEY"
+	expirationSeconds := 1
+
+	type Person struct {
+		Name  string `json:"name"`
+		Phone string `json:"phone"`
+	}
+
+	personIn := Person{
+		Name:  "Gael Félix Bertani",
+		Phone: "(99) 99999-9999",
+	}
+
+	vJSON, err := json.Marshal(personIn)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	err = client.Set(key, string(vJSON), expirationSeconds)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	personOut := Person{}
+
+	data, ok := client.MustGet(key)
+	if !ok {
+		log.Println(err)
+		return
+	}
+
+	err = json.Unmarshal([]byte(data), &personOut)
+	if err != nil {
+		log.Println(err)
+		return
 	}
 }

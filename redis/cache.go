@@ -6,14 +6,18 @@ import (
 	redigo "github.com/garyburd/redigo/redis"
 )
 
+// DefaultClient ...
+var DefaultClient = Client{
+	Host: "localhost",
+	Port: 6379,
+}
+
 // Client ...
 type Client struct {
 	Host string
 	Port int
 	conn *redigo.Conn
 }
-
-var err error
 
 // Conn ...
 func (c *Client) Conn() (conn redigo.Conn) {
