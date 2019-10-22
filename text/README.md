@@ -18,3 +18,6 @@ func PadRight(str, pad string, lenght int) string {}
 
 ## PadLeft ##
 func PadLeft(str, pad string, lenght int) string {}
+
+## StringIsEmptyOrWhiteSpace ##
+func StringIsEmptyOrWhiteSpace(str string) bool {}
