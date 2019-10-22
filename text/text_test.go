@@ -16,6 +16,14 @@ func TestOnlyNumbers(t *testing.T) {
 	assert.Equal(t, "123", OnlyNumbers("ABC123"))
 }
 
+func TestOnlyNumbersToInt64(t *testing.T) {
+	assert.Equal(t, int64(1), OnlyNumbersToInt64("1"))
+	assert.Equal(t, int64(12), OnlyNumbersToInt64("01"))
+	assert.Equal(t, int64(1), OnlyNumbersToInt64("A1"))
+	assert.Equal(t, int64(1), OnlyNumbersToInt64("A1A"))
+	assert.Equal(t, int64(0), OnlyNumbersToInt64("ABC"))
+}
+
 func TestNormalize(t *testing.T) {
 	var (
 		text string

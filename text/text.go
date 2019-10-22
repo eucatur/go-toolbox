@@ -4,6 +4,8 @@ package text
 import (
 	"math/rand"
 	"regexp"
+	"strconv"
+	"strings"
 	"unicode"
 
 	"golang.org/x/text/runes"
@@ -20,6 +22,17 @@ var regexExceptNumbers = regexp.MustCompile("[^0-9]")
 //
 func OnlyNumbers(str string) string {
 	return regexExceptNumbers.ReplaceAllString(str, "")
+}
+
+// OnlyNumbersToInt64 retorna apenas os números de uma string, removendo zeros a esquerda. Caso não tenha nenhum numero retorno é 0.
+//
+//   str := OnlyNumbersToInt64("A123BC")  // 123
+//   str := OnlyNumbersToInt64("00123")  // 123
+//   str := OnlyNumbersToInt64("ABC")  // 0
+//
+func OnlyNumbersToInt64(str string) int64 {
+	number, _ := strconv.ParseInt(strings.TrimLeft(OnlyNumbers(str), "0"), 10, 64)
+	return number
 }
 
 // Normalize substitui caracteres especiais de uma string por caracteres
