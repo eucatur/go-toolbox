@@ -8,15 +8,17 @@ import (
 
 // DefaultClient ...
 var DefaultClient = Client{
-	Host: "localhost",
-	Port: 6379,
+	Host:   "localhost",
+	Port:   6379,
+	Prefix: "",
 }
 
 // Client ...
 type Client struct {
-	Host string
-	Port int
-	conn *redigo.Conn
+	Host   string
+	Port   int
+	Prefix string
+	conn   *redigo.Conn
 }
 
 // Conn ...
@@ -36,6 +38,8 @@ func (c *Client) Conn() (conn redigo.Conn) {
 
 // Set ...
 func (c Client) Set(key, value string, expirationSeconds ...int) (err error) {
+	key = c.Prefix + key
+
 	_, err = c.Conn().Do("SET", key, value)
 	if err != nil {
 		return
@@ -50,7 +54,7 @@ func (c Client) Set(key, value string, expirationSeconds ...int) (err error) {
 
 // Get ...
 func (c Client) Get(key string) (value string, err error) {
-	return redigo.String(c.Conn().Do("GET", key))
+	return redigo.String(c.Conn().Do("GET", c.Prefix+key))
 }
 
 // MustGet ...
