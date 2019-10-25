@@ -10,11 +10,6 @@ func TestFull(t *testing.T) {
 	key := "KEY"
 	expirationSeconds := 1
 
-	client := Client{
-		Host: "localhost",
-		Port: 6379,
-	}
-
 	type Person struct {
 		Name  string `json:"name"`
 		Phone string `json:"phone"`
@@ -31,7 +26,7 @@ func TestFull(t *testing.T) {
 		return
 	}
 
-	err = client.Set(key, string(vJSON), expirationSeconds)
+	err = DefaultClient.Set(key, string(vJSON), expirationSeconds)
 	if err != nil {
 		t.Error(err)
 		return
@@ -39,7 +34,7 @@ func TestFull(t *testing.T) {
 
 	personOut := Person{}
 
-	data, ok := client.MustGet(key)
+	data, ok := DefaultClient.MustGet(key)
 	if !ok {
 		t.Error("Não foi possivel obter o cache.")
 		return
@@ -58,9 +53,27 @@ func TestFull(t *testing.T) {
 
 	time.Sleep(time.Duration(expirationSeconds) * time.Second)
 
-	data, ok = client.MustGet(key)
+	data, ok = DefaultClient.MustGet(key)
 	if ok {
 		t.Error("O cache não expirou.")
+		return
+	}
+
+	err = DefaultClient.Set(key, string(vJSON))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	err = DefaultClient.Delete(key)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, ok = DefaultClient.MustGet(key)
+	if ok {
+		t.Error("Não foi possivel deletar o cache.")
 		return
 	}
 
