@@ -6,20 +6,22 @@ import (
 	redigo "github.com/garyburd/redigo/redis"
 )
 
-// DefaultClient ...
-var DefaultClient = Client{
-	Host: "localhost",
-	Port: 6379,
-}
-
-// Client ...
+// Client is the structure used to create a redis connection client
 type Client struct {
-	Host string
-	Port int
-	conn *redigo.Conn
+	Host   string
+	Port   int
+	Prefix string
+	conn   *redigo.Conn
 }
 
-// Conn ...
+// DefaultClient is a default client to connect to local redis
+var DefaultClient = Client{
+	Host:   "localhost",
+	Port:   6379,
+	Prefix: "",
+}
+
+// Conn returns a redis connection to execute commands
 func (c *Client) Conn() (conn redigo.Conn) {
 	if c.conn != nil {
 		return *c.conn
@@ -34,8 +36,10 @@ func (c *Client) Conn() (conn redigo.Conn) {
 	return *c.conn
 }
 
-// Set ...
+// Set the string value of a key
 func (c Client) Set(key, value string, expirationSeconds ...int) (err error) {
+	key = c.Prefix + key
+
 	_, err = c.Conn().Do("SET", key, value)
 	if err != nil {
 		return
@@ -48,12 +52,12 @@ func (c Client) Set(key, value string, expirationSeconds ...int) (err error) {
 	return
 }
 
-// Get ...
+// Get the value of a key
 func (c Client) Get(key string) (value string, err error) {
-	return redigo.String(c.Conn().Do("GET", key))
+	return redigo.String(c.Conn().Do("GET", c.Prefix+key))
 }
 
-// MustGet ...
+// MustGet the value of a key and you can check for a boolean returned
 func (c Client) MustGet(key string) (value string, ok bool) {
 	var err error
 	value, err = c.Get(key)
@@ -62,4 +66,10 @@ func (c Client) MustGet(key string) (value string, ok bool) {
 	}
 
 	return value, true
+}
+
+// Delete a key
+func (c Client) Delete(key string) (err error) {
+	_, err = c.Conn().Do("DEL", c.Prefix+key)
+	return
 }

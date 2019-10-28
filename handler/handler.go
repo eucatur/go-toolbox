@@ -28,8 +28,7 @@ func BindAndValidate(c echo.Context, obj interface{}, args ...interface{}) (err 
 
 	err = c.Bind(obj)
 	if err != nil {
-		log.Error(err)
-		return c.JSON(422, &Handler{err.Error()})
+		return
 	}
 
 	var options []string
