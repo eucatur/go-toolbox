@@ -21,7 +21,7 @@ type Handler struct {
 	Message string `json:"message" form:"message" query:"message"`
 }
 
-// Like the name Validade and bind one struct with the validador golang lib
+// BindAndValidate like the name Validade and bind one struct with the validador golang lib
 func BindAndValidate(c echo.Context, obj interface{}, args ...interface{}) (err error) {
 	obj = reflect.ValueOf(obj).Elem().Interface()
 	obj = reflect.New(reflect.TypeOf(obj)).Interface()
@@ -41,7 +41,6 @@ func BindAndValidate(c echo.Context, obj interface{}, args ...interface{}) (err 
 
 	vErr := validator.Validate(obj, options...)
 	if vErr != nil {
-		log.Error(vErr)
 		err = c.JSON(422, vErr)
 		if err != nil {
 			return
