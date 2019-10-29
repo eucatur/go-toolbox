@@ -17,7 +17,7 @@ func Mask(cardNumber string) (cardMask string, err error) {
 
 	l := len(cardNumber)
 
-	cardMask = fmt.Sprintf("%s%s%s", cardNumber[0:4], strings.Repeat("X", l-8), cardNumber[l-4:l])
+	cardMask = fmt.Sprintf("%s%s%s", cardNumber[0:6], strings.Repeat("X", l-10), cardNumber[l-4:l])
 
 	return
 }
