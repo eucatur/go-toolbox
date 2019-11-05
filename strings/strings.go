@@ -41,3 +41,17 @@ func Coalesce(firstStr, secondStr string) string {
 	}
 	return secondStr
 }
+
+
+// ExistsValueInt verifica se o valor existe no slice de inteiros
+//
+//  existe := ExistsValueInt(200, []int{200, 204, 422})
+//
+func ExistsValueInt(value int, values []int) bool {
+	for _, v := range values {
+		if value == v {
+			return true
+		}
+	}
+	return false
+}
