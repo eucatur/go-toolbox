@@ -2,6 +2,8 @@
 package jwt
 
 import (
+	"errors"
+
 	jwt_go "github.com/dgrijalva/jwt-go"
 )
 
@@ -14,15 +16,27 @@ func CreateTokenWithClaims(claims jwt_go.MapClaims, secret string) (token string
 	return
 }
 
-// Verify if is token is valid
-func VerifyTokenAndGetClaims(tokenString, secret string) (map[string]interface{}, error) {
+// VerifyTokenAndGetClaims verify if is token is valid
+func VerifyTokenAndGetClaims(tokenString, secret string) (claims map[string]interface{}, err error) {
 	token, err := jwt_go.Parse(tokenString, func(token *jwt_go.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})
 
-	if claims, ok := token.Claims.(jwt_go.MapClaims); ok && token.Valid {
-		return claims, nil
-	} else {
-		return nil, err
+	if err != nil {
+		return
 	}
+
+	errInvalidToken := errors.New("token inválido")
+	if !token.Valid {
+		err = errInvalidToken
+		return
+	}
+
+	claims, ok := token.Claims.(jwt_go.MapClaims)
+	if !ok {
+		err = errInvalidToken
+		return
+	}
+
+	return
 }
