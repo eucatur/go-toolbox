@@ -65,3 +65,9 @@ func (t Timestamp) AddDate(years int, months int, days int) Timestamp {
 	t.Time = t.Time.AddDate(years, months, days)
 	return t
 }
+
+// ParseTimestamp ...
+func ParseTimestamp(value string) (timestamp Timestamp, err error) {
+	timestamp.Time, err = time.Parse(TimestampLayout, value)
+	return
+}
