@@ -33,15 +33,17 @@ func SnakeCase(str string) string {
 	return strings.Replace(str, "__", "_", -1)
 }
 
-// Coalesce se a primeira string(firstStr) não for vazia, retorna a primeira string.
-// Se a primeira string for vazia, retorna a segunda string(secondStr).
-func Coalesce(firstStr, secondStr string) string {
-	if strings.TrimSpace(firstStr) != "" {
-		return firstStr
+// Coalesce retorna a primeira string que não for vazia conforme a order informada.
+// Se todas forem vazias, o retorno também será vazio.
+func Coalesce(expressions ...string) string {
+	for _, expression := range expressions {
+		if strings.TrimSpace(expression) != "" {
+			return expression
+		}
 	}
-	return secondStr
-}
 
+	return ""
+}
 
 // ExistsValueInt verifica se o valor existe no slice de inteiros
 //
