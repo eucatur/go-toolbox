@@ -22,6 +22,15 @@ func Mask(cardNumber string) (cardMask string, err error) {
 	return
 }
 
+func TryMask(cardNumber string) (cardMask string) {
+	cardMask, err := Mask(cardNumber)
+	if err != nil {
+		return cardNumber
+	}
+
+	return
+}
+
 // Valid method to validate credit card
 func Valid(cardNumber string) bool {
 	cardNumber = text.OnlyNumbers(cardNumber)
