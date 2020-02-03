@@ -57,3 +57,15 @@ func ExistsValueInt(value int, values []int) bool {
 	}
 	return false
 }
+
+// ExactlyLength - de acordo com conteúdo informado irá retornar apenas o limite estipulado
+// conteudo := "Hello Word"
+// conteudo = ExactlyLength(conteudo, 5)
+// fmt.Print(conteudo) > Hello
+func ExactlyLength(content string, length int) string {
+	runes := []rune(strings.TrimSpace(content))
+	if len(runes) > length {
+		return string(runes[:length])
+	}
+	return strings.TrimSpace(content)
+}

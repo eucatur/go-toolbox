@@ -12,3 +12,6 @@ func Coalesce(firstStr, secondStr string) string {}
 
 ## ExistsValueInt ##
 func ExistsValueInt(value int, values []int) bool {}
+
+## ExactlyLength ##
+func ExactlyLength(content string, length int) string {}

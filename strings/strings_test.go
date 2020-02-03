@@ -28,3 +28,10 @@ func TestCoalesce(t *testing.T) {
 	assert.Equal(t, "second", Coalesce("", "second"))
 	assert.Equal(t, "", Coalesce("", ""))
 }
+
+func TestExactlyLength(t *testing.T) {
+	assert.Equal(t, "Hello", ExactlyLength("Hello Word", 5))
+	assert.Equal(t, "1234567890123456", ExactlyLength("12345678901234567890", 16))
+	assert.Equal(t, "LOREM IPSUM", ExactlyLength("LOREM IPSUM dolor sit amet", 11))
+	assert.Equal(t, "03/02/2020", ExactlyLength("03/02/2020 14:13:25", 10))
+}
