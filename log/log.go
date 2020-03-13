@@ -1,4 +1,4 @@
-// log in as super set of the standart golang "log" with somes new methods
+// Package log in as super set of the standart golang "log" with somes new methods
 package log
 
 import (
@@ -17,11 +17,12 @@ import (
 
 var debug = false
 
+// EnableDebug active the debug mode
 func EnableDebug(enable bool) {
 	debug = enable
 }
 
-// Print in terminal the error message and the line of code with de error
+// Error print in terminal the error message and the line of code with de error
 func Error(e error) {
 	pc := make([]uintptr, 10)
 	runtime.Callers(2, pc)
@@ -43,25 +44,25 @@ func Error(e error) {
 
 // Println use the same Println for the standart log lib
 func Println(i ...interface{}) {
-	log.Println(i)
+	log.Println(i...)
 }
 
 // Fatal use the same Fatal for the standart log lib
 func Fatal(i ...interface{}) {
-	log.Fatal(i)
+	log.Fatal(i...)
 }
 
 // Debug is a function for print in terminal if the variable debug it's true
 func Debug(a ...interface{}) {
 	if debug {
-		log.Println(a)
+		log.Println(a...)
 	}
 }
 
 // Debugf is a function for print formated in terminal if the variable debug it's true
 func Debugf(format string, v ...interface{}) {
 	if debug {
-		log.Printf(format, v)
+		log.Printf(format, v...)
 	}
 }
 
