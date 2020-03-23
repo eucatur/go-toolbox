@@ -77,11 +77,12 @@ func (t Timewooba) String() string {
 
 // ParseTimewooba ...
 func ParseTimewooba(value string) (timewooba Timewooba, err error) {
-	if len(value) != 26 {
+	if size := len(value); size < 26 || size > 29 {
 		err = errors.New("Invalid date")
 		return
 	}
 
+	value = strings.ReplaceAll(value, `\`, "")
 	nsecStr := value[6:19] + strings.Repeat("0", 6)
 
 	nsec, err := strconv.ParseInt(nsecStr, 10, 64)
