@@ -22,6 +22,25 @@ var (
 	}
 )
 
+func Test_fieldinterface(t *testing.T) {
+	type ErrorTest struct {
+		Code    interface{} `json:"Code"`
+		Message string      `json:"Message"`
+	}
+
+	type Strct struct {
+		Errors *[]ErrorTest `json:"errors" validate:"required"`
+	}
+
+	var strctFieldInterface Strct
+
+	expected.Details = map[string]interface{}{
+		"errors": "Informe ao menos um elemento para esse campo (array)",
+	}
+
+	test(t, expected, strctFieldInterface)
+}
+
 func Test_validator(t *testing.T) {
 	// teste de funções
 	vfield := &vField{}

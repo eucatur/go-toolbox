@@ -348,6 +348,10 @@ func toVField(previous *vField, a interface{}, tags *reflect.StructTag, name str
 				continue
 			}
 
+			if v.Field(i).Interface() == nil {
+				continue
+			}
+
 			vfs = append(vfs, toVField(vf, v.Field(i).Interface(), &fieldTags, t.Field(i).Name, false))
 		}
 
