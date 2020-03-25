@@ -55,7 +55,7 @@ func RandomCharacters(numberOfCharacters int) string {
 
 	b := make([]byte, numberOfCharacters)
 	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
 	}
 	return string(b)
 }
