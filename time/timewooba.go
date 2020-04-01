@@ -9,7 +9,10 @@ import (
 	"time"
 )
 
-// /Date(1584617088596-0300)/
+var timewoobaZoneToIANA = map[string]string{
+	"-0300": "America/Sao_Paulo",
+	"-0400": "America/Manaus",
+}
 
 // Timewooba ...
 type Timewooba struct{ time.Time }
@@ -31,7 +34,7 @@ func (t *Timewooba) UnmarshalJSON(bytes []byte) (err error) {
 		return
 	}
 
-	t = &timewooba
+	t.Time = timewooba.Time
 	return
 }
 
@@ -90,6 +93,19 @@ func ParseTimewooba(value string) (timewooba Timewooba, err error) {
 		return
 	}
 
-	timewooba = Timewooba{time.Unix(0, nsec)}
+	timewooba.Time = time.Unix(0, nsec)
+
+	iana, ok := timewoobaZoneToIANA[value[19:24]]
+	if !ok {
+		err = errors.New("IANA not mapped")
+		return
+	}
+
+	loc, err := time.LoadLocation(iana)
+	if err != nil {
+		return
+	}
+
+	timewooba.Time = timewooba.Time.In(loc)
 	return
 }

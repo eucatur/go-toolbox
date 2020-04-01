@@ -86,10 +86,8 @@ func TestTimewoobaScan(t *testing.T) {
 func TestTimewoobaValue(t *testing.T) {
 	assert := assert.New(t)
 
-	timewooba, err := ParseTimewooba(woobaDate)
+	dateActual, err := ParseTimewooba(woobaDate)
 	assert.Equal(nil, err)
-
-	dateActual := Timewooba{Time: timewooba.Time}
 
 	value, err := dateActual.Value()
 	assert.Equal(nil, err)
