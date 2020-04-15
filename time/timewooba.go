@@ -4,9 +4,11 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
-	"strings"
 	"time"
+
+	"github.com/eucatur/go-toolbox/text"
 )
 
 var timewoobaZoneToIANA = map[string]string{
@@ -80,22 +82,28 @@ func (t Timewooba) String() string {
 
 // ParseTimewooba ...
 func ParseTimewooba(value string) (timewooba Timewooba, err error) {
-	if size := len(value); size < 26 || size > 29 {
+	rgx := regexp.MustCompile(`(\/Date\()(-?[0-9]{13,15})([+|-][0-9]{4})(\)\/)`)
+
+	matches := rgx.FindStringSubmatch(value)
+	if len(matches) != 5 {
 		err = errors.New("Invalid date")
 		return
 	}
 
-	value = strings.ReplaceAll(value, `\`, "")
-	nsecStr := value[6:19] + strings.Repeat("0", 6)
+	nsecStr := text.RPad(matches[2], 19, "0")
 
 	nsec, err := strconv.ParseInt(nsecStr, 10, 64)
 	if err != nil {
 		return
 	}
 
+	if nsec < 1 {
+		return
+	}
+
 	timewooba.Time = time.Unix(0, nsec)
 
-	iana, ok := timewoobaZoneToIANA[value[19:24]]
+	iana, ok := timewoobaZoneToIANA[matches[3]]
 	if !ok {
 		err = errors.New("IANA not mapped")
 		return
