@@ -96,3 +96,14 @@ func TestTimewoobaValue(t *testing.T) {
 	assert.Equal(true, ok)
 	assert.Equal(woobaDate, valueString)
 }
+
+func TestTimewoobaIsZero(t *testing.T) {
+	assert := assert.New(t)
+
+	woobaDate := "/Date(-62135589600000-0300)/"
+
+	dateActual, err := ParseTimewooba(woobaDate)
+	assert.Equal(nil, err)
+
+	assert.Equal(true, dateActual.IsZero())
+}
