@@ -11,11 +11,6 @@ import (
 	"github.com/eucatur/go-toolbox/text"
 )
 
-var timewoobaZoneToIANA = map[string]string{
-	"-0300": "America/Sao_Paulo",
-	"-0400": "America/Manaus",
-}
-
 // Timewooba ...
 type Timewooba struct{ time.Time }
 
@@ -103,17 +98,11 @@ func ParseTimewooba(value string) (timewooba Timewooba, err error) {
 
 	timewooba.Time = time.Unix(0, nsec)
 
-	iana, ok := timewoobaZoneToIANA[matches[3]]
-	if !ok {
-		err = errors.New("IANA not mapped")
-		return
-	}
+	dateTime := timewooba.Time.Format("2006-01-02 15:04:05")
+	timeZone := matches[3]
 
-	loc, err := time.LoadLocation(iana)
-	if err != nil {
-		return
-	}
+	valueToParse := fmt.Sprintf("%s %s", dateTime, timeZone)
 
-	timewooba.Time = timewooba.Time.In(loc)
+	timewooba.Time, err = time.Parse("2006-01-02 15:04:05 -0700", valueToParse)
 	return
 }
