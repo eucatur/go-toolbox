@@ -132,3 +132,22 @@ func SetOutputFiles(outfilePath, errfilePath string) {
 	syscall.Dup2(int(outFile.Fd()), 1) /* -- stdout */
 	syscall.Dup2(int(errFile.Fd()), 2) /* -- stderr */
 }
+
+// ReturnDetailsError return the error message and the line of code with de error
+func ReturnDetailsError(e error) (buildedErrorDetails string) {
+	pc := make([]uintptr, 10)
+	runtime.Callers(2, pc)
+	f := runtime.FuncForPC(pc[0])
+	file, line := f.FileLine(pc[0])
+
+	hostname, err := os.Hostname()
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	buildedErrorDetails = fmt.Sprintf("ERROR: %s | FILE: %s:%d | LINE: %d | FUNCTION: %s | HOSTNAME: %s\n", e.Error(), file, line, line, f.Name(), hostname)
+
+	return
+
+}
