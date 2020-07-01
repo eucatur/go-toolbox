@@ -96,10 +96,25 @@ func ParseTimewooba(value string) (timewooba Timewooba, err error) {
 		return
 	}
 
-	timewooba.Time = time.Unix(0, nsec)
+	name, _ := time.Now().Zone()
+	durationLocalStr := fmt.Sprintf("%.3sh", name)
+
+	durationLocal, err := time.ParseDuration(durationLocalStr)
+	if err != nil {
+		return
+	}
+
+	timeZone := matches[3]
+	durationTimeZoneStr := fmt.Sprintf("%.3sh", timeZone)
+
+	durationTimeZone, err := time.ParseDuration(durationTimeZoneStr)
+	if err != nil {
+		return
+	}
+
+	timewooba.Time = time.Unix(0, nsec).Add(-durationLocal).Add(durationTimeZone)
 
 	dateTime := timewooba.Time.Format("2006-01-02 15:04:05")
-	timeZone := matches[3]
 
 	valueToParse := fmt.Sprintf("%s %s", dateTime, timeZone)
 

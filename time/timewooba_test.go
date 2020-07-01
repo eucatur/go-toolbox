@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	rfc3339Date = "2020-03-20T14:02:50-04:00"
-	woobaDate   = "/Date(1584727370000-0400)/"
+	rfc3339Date = "2020-07-20T06:05:00-03:00"
+	woobaDate   = "/Date(1595235900000-0300)/"
 )
 
 func TestTimewoobaUnmarshal(t *testing.T) {
