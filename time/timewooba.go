@@ -72,7 +72,20 @@ func (t Timewooba) String() string {
 	if t.IsZero() {
 		return ""
 	}
-	return fmt.Sprintf("/Date(%.13s%s)/", strconv.FormatInt(t.UnixNano(), 10), t.Format("-0700"))
+
+	date := t.Time.String()
+	fmt.Println(date)
+
+	_, localOffset := time.Now().Zone()
+	_, tOffset := t.Zone()
+
+	unixNano := t.UnixNano()
+	unixNanoOffset := unixNano - int64(localOffset*1e9) + int64(tOffset*1e9)
+	tz := t.Format("-0700")
+
+	r := fmt.Sprintf("/Date(%.13s%s)/", strconv.FormatInt(unixNanoOffset, 10), tz)
+
+	return r
 }
 
 // ParseTimewooba ...
@@ -96,26 +109,11 @@ func ParseTimewooba(value string) (timewooba Timewooba, err error) {
 		return
 	}
 
-	name, _ := time.Now().Zone()
-	durationLocalStr := fmt.Sprintf("%.3sh", name)
-
-	durationLocal, err := time.ParseDuration(durationLocalStr)
-	if err != nil {
-		return
-	}
-
-	timeZone := matches[3]
-	durationTimeZoneStr := fmt.Sprintf("%.3sh", timeZone)
-
-	durationTimeZone, err := time.ParseDuration(durationTimeZoneStr)
-	if err != nil {
-		return
-	}
-
-	timewooba.Time = time.Unix(0, nsec).Add(-durationLocal).Add(durationTimeZone)
+	timewooba.Time = time.Unix(0, nsec)
 
 	dateTime := timewooba.Time.Format("2006-01-02 15:04:05")
 
+	timeZone := matches[3]
 	valueToParse := fmt.Sprintf("%s %s", dateTime, timeZone)
 
 	timewooba.Time, err = time.Parse("2006-01-02 15:04:05 -0700", valueToParse)
