@@ -203,29 +203,33 @@ func Test_len(t *testing.T) {
 	// len correto
 	structLen := struct {
 		LenString      string   `json:"lenstring" validate:"len=10" errmsg:"Enter ten characters"`
+		LenStringAcute string   `json:"lenstringacute" validate:"len=9" errmsg:"Enter nine characters"`
 		LenStringEmpty string   `json:"lenstringempty" validate:"len=10" errmsg:"Enter ten characters"`
 		LenInt         int      `json:"lenint" validate:"len=5" errmsg:"Enter five characters"`
 		LenInt64       int      `json:"lenint64" validate:"len=5" errmsg:"Enter five characters"`
 		LenSlice       []string `json:"lenslice" validate:"len=3" errmsg:"Enter three characters"`
 		LenInvalid     string   `json:"leninvalid" validate:"len=len_test_invalid_int" errmsg:"Message"`
 	}{
-		LenString: "Tecnologia",
-		LenInt:    12345,
-		LenInt64:  12345,
-		LenSlice:  []string{"A", "B", "C"},
+		LenString:      "Tecnologia",
+		LenStringAcute: "Tecnólogo",
+		LenInt:         12345,
+		LenInt64:       12345,
+		LenSlice:       []string{"A", "B", "C"},
 	}
 
 	test(t, expectedNil, structLen)
 
 	// len incorreto
 	structLen.LenString = "Tecnologias"
+	structLen.LenStringAcute = "Tecnólogos"
 	structLen.LenInt = 123456
 	structLen.LenSlice = []string{"A", "B", "C", "D"}
 
 	expected.Details = map[string]interface{}{
-		"lenstring": "Enter ten characters",
-		"lenint":    "Enter five characters",
-		"lenslice":  "Enter three characters",
+		"lenstring":      "Enter ten characters",
+		"lenstringacute": "Enter nine characters",
+		"lenint":         "Enter five characters",
+		"lenslice":       "Enter three characters",
 	}
 
 	test(t, expected, structLen)
@@ -273,6 +277,7 @@ func Test_max(t *testing.T) {
 	// max correto
 	structMax := struct {
 		MaxString         string   `json:"maxstring" validate:"max=10" errmsg:"Enter a maximum of ten characters"`
+		MaxStringAcute    string   `json:"maxstringacute" validate:"max=9" errmsg:"Enter a maximum of nine characters"`
 		MaxInt            int      `json:"maxint" validate:"max=5" errmsg:"The maximum value for the field is five"`
 		MaxInt64          int64    `json:"maxint64" validate:"max=5" errmsg:"The maximum value for the field is five"`
 		MaxFloat64        float64  `json:"maxfloat64" validate:"max=5.5" errmsg:"The maximum value for the field is 5.5"`
@@ -280,24 +285,27 @@ func Test_max(t *testing.T) {
 		MaxInvalid        string   `json:"maxinvalid" validate:"max=max_invalid_int" errmsg:"Message"`
 		MaxInvalidFloat64 float64  `json:"maxinvalidfloat64" validate:"max=max_invalid_float64" errmsg:"Message"`
 	}{
-		MaxString:  "Tecnologia",
-		MaxInt:     5,
-		MaxInt64:   5,
-		MaxFloat64: 5.5,
-		MaxSlice:   []string{"A", "B", "C"},
+		MaxString:      "Tecnologia",
+		MaxStringAcute: "Tecnólogo",
+		MaxInt:         5,
+		MaxInt64:       5,
+		MaxFloat64:     5.5,
+		MaxSlice:       []string{"A", "B", "C"},
 	}
 
 	test(t, expectedNil, structMax)
 
 	// max incorreto
 	structMax.MaxString = "Tecnologias"
+	structMax.MaxStringAcute = "Tecnólogos"
 	structMax.MaxInt = 6
 	structMax.MaxInt64 = 6
 	structMax.MaxFloat64 = 5.6
 	structMax.MaxSlice = []string{"A", "B", "C", "D"}
 
 	expected.Details = map[string]interface{}{
-		"maxstring":  "Enter a maximum of ten characters",
+		"maxstring":      "Enter a maximum of ten characters",
+		"maxstringacute": "Enter a maximum of nine characters",
 		"maxint":     "The maximum value for the field is five",
 		"maxint64":   "The maximum value for the field is five",
 		"maxfloat64": "The maximum value for the field is 5.5",

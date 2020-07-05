@@ -154,10 +154,22 @@ func vLen(vf vField) string {
 		warning(err)
 	}
 
+	if vf.isString() {
+
+		if vf.toString() != "" && len([]rune(vf.toString())) != length {
+			return fmt.Sprintf(msg, validationString)
+		}
+
+		return ""
+
+	}
+
 	if vf.len() > 0 && vf.len() != length {
+
 		if vf.isSlice() {
 			return fmt.Sprintf("O campo deve ter %s elemmento(s)", validationString)
 		}
+
 		return fmt.Sprintf(msg, validationString)
 	}
 
@@ -229,7 +241,7 @@ func vMax(vf vField) string {
 		}
 	}
 
-	if vf.isString() && vf.len() > maxInt {
+	if vf.isString() && len([]rune(vf.toString())) > maxInt {
 		return fmt.Sprintf("O parametro deve ter no máximo %d caracteres", maxInt)
 	}
 
