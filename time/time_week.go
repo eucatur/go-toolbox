@@ -11,11 +11,11 @@ func WeekDayPTBr(date time.Time) (weekDay string) {
 		weekDay = "Domingo"
 	case time.Monday:
 		weekDay = "Segunda-feira"
-	case time.Thursday:
+	case time.Tuesday:
 		weekDay = "Terça-feira"
 	case time.Wednesday:
 		weekDay = "Quarta-feira"
-	case time.Tuesday:
+	case time.Thursday:
 		weekDay = "Quinta-feira"
 	case time.Friday:
 		weekDay = "Sexta-feira"
