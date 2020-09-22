@@ -73,3 +73,31 @@ func (c Client) Delete(key string) (err error) {
 	_, err = c.Conn().Do("DEL", c.Prefix+key)
 	return
 }
+
+// Delete todas as chaves onde contém o pattern localizado
+func (c Client) DeleteLike(pattern string) (err error) {
+	iter := 0
+	for {
+		arr, err := redigo.Values(c.Conn().Do("SCAN", iter, "MATCH", "*"+pattern+"*"))
+		if err != nil {
+			return fmt.Errorf("error retrieving '%s' keys", c.Prefix+pattern)
+		}
+
+		iter, _ = redigo.Int(arr[0], nil)
+		keys, _ := redigo.Strings(arr[1], nil)
+
+		for _, key := range keys {
+			_, err = c.Conn().Do("DEL", key)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		if iter == 0 {
+			break
+		}
+	}
+
+	return nil
+}
