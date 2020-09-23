@@ -58,6 +58,19 @@ func ExistsValueInt(value int, values []int) bool {
 	return false
 }
 
+// ExistsValueInt64 verifica se o valor existe no slice de inteiros base 64
+//
+//  existe := ExistsValueInt64(200, []int{200, 204, 422})
+//
+func ExistsValueInt64(value int64, values []int64) bool {
+	for _, v := range values {
+		if value == v {
+			return true
+		}
+	}
+	return false
+}
+
 // ExactlyLength - de acordo com conteúdo informado irá retornar apenas o limite estipulado
 // conteudo := "Hello Word"
 // conteudo = ExactlyLength(conteudo, 5)
