@@ -30,6 +30,7 @@ type dbConfig struct {
 }
 
 var connections = map[string]*sqlx.DB{}
+var _config = dbConfig{}
 
 func get(filePath string) (*sqlx.DB, error) {
 	if db, found := connections[filePath]; found {
@@ -103,6 +104,7 @@ func GetByFile(filePath string) (*sqlx.DB, error) {
 	}
 
 	config.FilePath = filePath
+	_config = config
 
 	return connect(config)
 }
