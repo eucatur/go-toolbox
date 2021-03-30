@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/eucatur/go-toolbox/json"
 	"github.com/jmoiron/sqlx"
@@ -13,16 +14,19 @@ import (
 )
 
 type dbConfig struct {
-	FilePath           string
-	PathToDBFile       string `json:"path_to_db_file"`
-	Type               string `json:"type"`
-	Host               string `json:"host"`
-	Port               int    `json:"port"`
-	User               string `json:"user"`
-	Password           string `json:"password"`
-	DataBase           string `json:"database"`
-	MaxOpenConnections int    `json:"max_open_connections"`
-	SSLMode            string `json:"ssl_mode"`
+	FilePath     string
+	PathToDBFile string `json:"path_to_db_file"`
+	Type         string `json:"type"`
+	Host         string `json:"host"`
+	Port         int    `json:"port"`
+	User         string `json:"user"`
+	Password     string `json:"password"`
+	DataBase     string `json:"database"`
+	SSLMode      string `json:"ssl_mode"`
+
+	MaxLifeTime       int `json:"max_life_time"`
+	MaxOpenConnection int `json:"max_open_connection"`
+	MaxIdleConnection int `json:"max_idle_connection"`
 }
 
 var connections = map[string]*sqlx.DB{}
@@ -71,12 +75,11 @@ func connect(config dbConfig) (*sqlx.DB, error) {
 		return nil, fmt.Errorf(`Error connecting to database of type "%s" because of: %s`, config.Type, err.Error())
 	}
 
-	if config.MaxOpenConnections > 0 {
-		db.SetMaxOpenConns(config.MaxOpenConnections)
-	}
+	maxLifeTime := time.Duration(config.MaxLifeTime)
 
-	db.SetMaxIdleConns(0)
-	db.SetConnMaxLifetime(0)
+	db.SetMaxOpenConns(config.MaxOpenConnection)
+	db.SetMaxIdleConns(config.MaxIdleConnection)
+	db.SetConnMaxLifetime(maxLifeTime * time.Minute)
 
 	connections[config.FilePath] = db
 	return db, nil
