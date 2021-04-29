@@ -14,6 +14,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	"go.elastic.co/apm/module/apmsql"
+	_ "go.elastic.co/apm/module/apmsql/mysql"
 	_ "go.elastic.co/apm/module/apmsql/pq"
 	_ "go.elastic.co/apm/module/apmsql/sqlite3"
 )
