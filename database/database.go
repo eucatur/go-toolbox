@@ -75,7 +75,7 @@ func connect(config dbConfig) (*sqlx.DB, error) {
 		))
 
 	case "mysql":
-		db, err = sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&multiStatements=true",
+		db, err = sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
 			config.User,
 			config.Password,
 			config.Host,
