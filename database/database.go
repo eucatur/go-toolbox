@@ -116,7 +116,7 @@ func connectCtx(config dbConfig) (*sql.DB, error) {
 			return nil, err
 		}
 
-		db, err = apmsql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
+		db, err = apmsql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&multiStatements=true",
 			config.User,
 			config.Password,
 			config.Host,
