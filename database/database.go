@@ -1,6 +1,8 @@
 package database
 
 import (
+	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -11,6 +13,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
+
+	"go.elastic.co/apm/module/apmsql"
+	_ "go.elastic.co/apm/module/apmsql/mysql"
+	_ "go.elastic.co/apm/module/apmsql/pq"
+	_ "go.elastic.co/apm/module/apmsql/sqlite3"
 )
 
 type dbConfig struct {
@@ -27,13 +34,24 @@ type dbConfig struct {
 	MaxLifeTime       int `json:"max_life_time"`
 	MaxOpenConnection int `json:"max_open_connection"`
 	MaxIdleConnection int `json:"max_idle_connection"`
+
+	Context *context.Context
 }
 
 var connections = map[string]*sqlx.DB{}
+var connectionsCtx = map[string]*sql.DB{}
+
 var _config = dbConfig{}
 
 func get(filePath string) (*sqlx.DB, error) {
 	if db, found := connections[filePath]; found {
+		return db, nil
+	}
+	return nil, fmt.Errorf(`Error database not found. File path: %s`, filePath)
+}
+
+func getCtx(filePath string) (*sql.DB, error) {
+	if db, found := connectionsCtx[filePath]; found {
 		return db, nil
 	}
 	return nil, fmt.Errorf(`Error database not found. File path: %s`, filePath)
@@ -86,6 +104,50 @@ func connect(config dbConfig) (*sqlx.DB, error) {
 	return db, nil
 }
 
+func connectCtx(config dbConfig) (*sql.DB, error) {
+	var (
+		db  *sql.DB
+		err error
+	)
+
+	switch config.Type {
+	case "mysql":
+		if config.Context == nil {
+			return nil, err
+		}
+
+		db, err = apmsql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&multiStatements=true",
+			config.User,
+			config.Password,
+			config.Host,
+			config.Port,
+			config.DataBase,
+		))
+		if err != nil {
+			return nil, err
+		}
+		if err = db.PingContext(*config.Context); err != nil {
+			db.Close()
+			return nil, err
+		}
+	default:
+		return nil, errors.New("Error database type is not supported")
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf(`Error connecting to database of type "%s" because of: %s`, config.Type, err.Error())
+	}
+
+	maxLifeTime := time.Duration(config.MaxLifeTime)
+
+	db.SetMaxOpenConns(config.MaxOpenConnection)
+	db.SetMaxIdleConns(config.MaxIdleConnection)
+	db.SetConnMaxLifetime(maxLifeTime * time.Minute)
+
+	connectionsCtx[config.FilePath] = db
+	return db, nil
+}
+
 // GetByFile Create a database connection through
 // the path of a file
 func GetByFile(filePath string) (*sqlx.DB, error) {
@@ -109,10 +171,45 @@ func GetByFile(filePath string) (*sqlx.DB, error) {
 	return connect(config)
 }
 
+// GetByFile Create a database connection through
+// the path of a file
+func GetByFileCtx(ctx *context.Context, filePath string) (*sql.DB, error) {
+
+	if db, err := getCtx(filePath); err == nil {
+		return db, nil
+	}
+
+	var (
+		config dbConfig
+		err    error
+	)
+
+	if err = json.UnmarshalFile(filePath, &config); err != nil {
+		return nil, err
+	}
+
+	config.FilePath = filePath
+	config.Context = ctx
+	_config = config
+
+	return connectCtx(config)
+
+}
+
 // MustGetByFile Create a database connection through
 // the path of a file and generates a panic in case of error
 func MustGetByFile(filePath string) *sqlx.DB {
 	db, err := GetByFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+	return db
+}
+
+// MustGetByFile Create a database connection through
+// the path of a file and generates a panic in case of error
+func MustGetByFileCtx(ctx context.Context, filePath string) *sql.DB {
+	db, err := GetByFileCtx(&ctx, filePath)
 	if err != nil {
 		panic(err)
 	}
