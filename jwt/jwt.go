@@ -40,3 +40,32 @@ func VerifyTokenAndGetClaims(tokenString, secret string) (claims map[string]inte
 
 	return
 }
+
+func VerifyTokenAndGetClaimsWithRSAPublicKey(tokenString string, public_key []byte) (claims map[string]interface{}, err error) {
+	verifyKey, err := jwt_go.ParseRSAPublicKeyFromPEM(public_key)
+	if err != nil {
+		return
+	}
+
+	token, err := jwt_go.Parse(tokenString, func(token *jwt_go.Token) (interface{}, error) {
+		return verifyKey, nil
+	})
+
+	if err != nil {
+		return
+	}
+
+	errInvalidToken := errors.New("token inválido")
+	if !token.Valid {
+		err = errInvalidToken
+		return
+	}
+
+	claims, ok := token.Claims.(jwt_go.MapClaims)
+	if !ok {
+		err = errInvalidToken
+		return
+	}
+
+	return
+}
