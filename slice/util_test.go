@@ -60,3 +60,58 @@ func Test_SliceExistsMapStrings(t *testing.T) {
 	assert.Equal(t, true, SliceExists(values["foo"], "anything"))
 
 }
+
+func Test_SliceExistsStructSomeFields(t *testing.T) {
+
+	strct := []struct {
+		Field string
+		Value string
+	}{
+		{
+			Field: "Field01",
+			Value: "Value01",
+		},
+		{
+			Field: "Field02",
+			Value: "Value02",
+		},
+	}
+
+	test := struct {
+		Field string
+		Value string
+	}{
+		Field: "Field01",
+		Value: "Value01",
+	}
+
+	assert.Equal(t, true, SliceExists(strct, test))
+
+}
+
+func Test_SliceExistsStructOneField(t *testing.T) {
+
+	strct := []struct {
+		Field string
+		Value string
+	}{
+		{
+			Field: "Field01",
+			Value: "Value01",
+		},
+		{
+			Field: "Field02",
+			Value: "Value02",
+		},
+	}
+
+	test := struct {
+		Field string
+		Value string
+	}{
+		Field: "Field01",
+	}
+
+	assert.Equal(t, false, SliceExists(strct, test))
+
+}
