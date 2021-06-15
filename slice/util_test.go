@@ -46,3 +46,17 @@ func Test_SliceExistsFloat(t *testing.T) {
 
 	assert.Equal(t, true, SliceExists(values, 33.7))
 }
+
+func Test_SliceExistsMapStrings(t *testing.T) {
+
+	values := make(map[string][]string)
+
+	values["bla"] = []string{"blabla"}
+
+	assert.Equal(t, false, SliceExists(values["bla"], "test"))
+
+	values["foo"] = []string{"anything"}
+
+	assert.Equal(t, true, SliceExists(values["foo"], "anything"))
+
+}
