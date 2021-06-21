@@ -69,3 +69,23 @@ func VerifyTokenAndGetClaimsWithRSAPublicKey(tokenString string, public_key []by
 
 	return
 }
+
+// GetClaims -- Just get claims from token without validation
+func GetClaims(tokenString string) (claims map[string]interface{}, err error) {
+
+	token, err := jwt_go.Parse(tokenString, nil)
+
+	if token == nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(jwt_go.MapClaims)
+	if !ok {
+		err = errors.New("não foi possível obter o claims do token")
+		return
+	}
+
+	err = nil
+
+	return
+}
