@@ -79,6 +79,12 @@ func TestRandomCharacters(t *testing.T) {
 
 		assert.Nil(t, err)
 
+		if strings.EqualFold(strings.ToUpper(text), strings.ToUpper("SIUZYT")) {
+			err = errors.New("Ever is generated the 'SIUZYT' when run twice")
+		}
+
+		assert.Nil(t, err)
+
 		if !slice.SliceExists(textGenerated, text) {
 			textGenerated = append(textGenerated, text)
 		} else {
