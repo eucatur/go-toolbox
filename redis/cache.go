@@ -10,6 +10,7 @@ import (
 type Client struct {
 	Host   string
 	Port   int
+	DB     int
 	Prefix string
 	conn   *redigo.Conn
 }
@@ -17,6 +18,7 @@ type Client struct {
 // DefaultClient is a default client to connect to local redis
 var DefaultClient = Client{
 	Host:   "localhost",
+	DB:     0,
 	Port:   6379,
 	Prefix: "",
 }
@@ -27,7 +29,7 @@ func (c *Client) Conn() (conn redigo.Conn) {
 		return *c.conn
 	}
 
-	conn, err := redigo.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, c.Port))
+	conn, err := redigo.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, c.Port), redigo.DialDatabase(c.DB))
 	if err != nil {
 		panic(err.Error())
 	}
