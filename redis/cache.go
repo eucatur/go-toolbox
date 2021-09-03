@@ -6,6 +6,14 @@ import (
 	redigo "github.com/garyburd/redigo/redis"
 )
 
+// Args is a helper for constructing command arguments from structured values.
+type Args []interface{}
+
+// Add returns the result of appending value to args.
+func (args Args) Add(value ...interface{}) Args {
+	return append(args, value...)
+}
+
 // Client is the structure used to create a redis connection client
 type Client struct {
 	Host   string
@@ -103,3 +111,56 @@ func (c Client) DeleteLike(pattern string) (err error) {
 
 	return nil
 }
+
+//Do Abre uma conexão com o Redis, executa o comando e depois a fecha
+func (c Client) Send(comando string, args ...interface{}) (interface{}, error) {
+	value := c.Conn().Send(comando, args...)
+	if value != nil {
+		return nil, value
+	}
+	return value, nil
+}
+
+//**** HM
+
+/*// HMGet the value of a key
+func (c Client) HMGet(key string) (values []string, err error) {
+	return redigo.Strings(c.Conn().Do("HMGET", c.Prefix+key))
+}
+
+// MustGet the value of a key and you can check for a boolean returned
+func (c Client) HMMustGet(key string) (values []string, ok bool) {
+	var err error
+	values, err = c.HMGet(key)
+	if err != nil || len(values) == 0 {
+		return []string{}, false
+	}
+
+	return values, true
+}
+
+
+// HMSet the string value of a key
+func (c Client) HMSet(key string, expirationSeconds int,
+	values ...interface{}) (err error) {
+	key = c.Prefix + key
+
+	valuesArray := Args{}.Add(key).Add(values...)
+
+	_, err = c.Conn().Do("HMSET", valuesArray)
+	if err != nil {
+		return
+	}
+
+	if expirationSeconds > 0 {
+		_, err = c.Conn().Do("EXPIRE", key, expirationSeconds)
+	}
+
+	return
+}
+
+// HMDelete a key
+func (c Client) HMDelete(key string) (err error) {
+	_, err = c.Conn().Do("HMDEL", c.Prefix+key)
+	return
+}*/
