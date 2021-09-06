@@ -2,7 +2,6 @@ package redis
 
 import (
 	"fmt"
-
 	redigo "github.com/garyburd/redigo/redis"
 )
 
@@ -47,7 +46,7 @@ func (c *Client) Conn() (conn redigo.Conn) {
 }
 
 // Set the string value of a key
-func (c Client) Set(key, value string, expirationSeconds ...int) (err error) {
+func (c Client) Set(key, value string, expirationSeconds int) (err error) {
 	key = c.Prefix + key
 
 	_, err = c.Conn().Do("SET", key, value)
@@ -55,8 +54,8 @@ func (c Client) Set(key, value string, expirationSeconds ...int) (err error) {
 		return
 	}
 
-	if len(expirationSeconds) > 0 {
-		_, err = c.Conn().Do("EXPIRE", key, expirationSeconds[0])
+	if expirationSeconds > 0 {
+		_, err = c.Conn().Do("EXPIRE", key, expirationSeconds)
 	}
 
 	return
@@ -112,55 +111,70 @@ func (c Client) DeleteLike(pattern string) (err error) {
 	return nil
 }
 
-//Do Abre uma conexão com o Redis, executa o comando e depois a fecha
-func (c Client) Send(comando string, args ...interface{}) (interface{}, error) {
-	value := c.Conn().Send(comando, args...)
-	if value != nil {
-		return nil, value
-	}
-	return value, nil
+//Send Abre uma conexão com o Redis, executa o comando e depois a fecha
+func (c Client) Do(comando string, args ...interface{}) (interface{}, error) {
+	/*	value := c.Conn().(comando, args...)
+		if value != nil {
+			return nil, value
+		}
+		return value, nil*/
+
+	return c.Conn().Do(comando, args...)
 }
 
 //**** HM
-
-/*// HMGet the value of a key
-func (c Client) HMGet(key string) (values []string, err error) {
+/*
+// HMGet the value of a key
+func (c Client) HMGet(key string) ([]string, error) {
 	return redigo.Strings(c.Conn().Do("HMGET", c.Prefix+key))
+	//values, err := c.Send("HGETALL", c.Prefix+key)
+	//if err != nil{
+	//	return []string{}, err
+	//}
+	//return redigo.Strings(values, nil), nil
+
 }
 
+
+
 // MustGet the value of a key and you can check for a boolean returned
-func (c Client) HMMustGet(key string) (values []string, ok bool) {
+func (c Client) HMMustGet(key string) ([]string, bool) {
 	var err error
-	values, err = c.HMGet(key)
-	if err != nil || len(values) == 0 {
+	values, err := c.HMGet(key)
+	if err != nil {
 		return []string{}, false
 	}
 
-	return values, true
+	a, err := redigo.Strings(values, nil)
+	if err != nil {
+		return []string{}, false
+	}
+	return a, true
 }
 
-
 // HMSet the string value of a key
-func (c Client) HMSet(key string, expirationSeconds int,
-	values ...interface{}) (err error) {
-	key = c.Prefix + key
+func (c Client) HMSet(values ...interface{}) (err error) {
+	//var key = fmt.Sprintf( c.Prefix , values[0])
 
-	valuesArray := Args{}.Add(key).Add(values...)
+	//valuesArray := Args{}.Add(key).Add(values...)
 
-	_, err = c.Conn().Do("HMSET", valuesArray)
+	//c.Send("HMSET", "album:1", "title", "Red", "rating", 5)
+	c.Send("HMSET", values...)
+
 	if err != nil {
-		return
+		return err
 	}
 
-	if expirationSeconds > 0 {
-		_, err = c.Conn().Do("EXPIRE", key, expirationSeconds)
-	}
-
+	//if expirationSeconds > 0 {
+	//	_, err = c.Conn().Do("EXPIRE", key, expirationSeconds)
+	//}
+	//
 	return
 }
 
 // HMDelete a key
 func (c Client) HMDelete(key string) (err error) {
-	_, err = c.Conn().Do("HMDEL", c.Prefix+key)
+	err = c.Delete(c.Prefix+key)
 	return
-}*/
+}
+*/
