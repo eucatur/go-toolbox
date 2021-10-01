@@ -38,3 +38,26 @@ func Valid(cardNumber string) bool {
 
 	return l > 13 && l < 19
 }
+
+func GetInicialBin(cardNumber string) string {
+
+	cardNumber = strings.Join(strings.Fields(strings.TrimSpace(cardNumber)), "")
+
+	if len([]rune(cardNumber)) >= 6 {
+		return cardNumber[:6]
+	}
+
+	return ""
+
+}
+
+func GetFinalBin(cardNumber string) string {
+
+	cardNumber = strings.Join(strings.Fields(strings.TrimSpace(cardNumber)), "")
+
+	if len([]rune(cardNumber)) >= 4 {
+		return cardNumber[len([]rune(cardNumber))-4:]
+	}
+
+	return ""
+}
