@@ -2,6 +2,7 @@ package redis
 
 import (
 	"fmt"
+
 	redigo "github.com/garyburd/redigo/redis"
 )
 
@@ -43,6 +44,16 @@ func (c *Client) Conn() (conn redigo.Conn) {
 
 	c.conn = &conn
 	return *c.conn
+}
+
+func (c *Client) Ping() {
+
+	_, err := c.Conn().Do("PING")
+
+	if err != nil {
+		panic(fmt.Errorf("não foi possível estabelecer conexão com redis. Detalhes: %s", err.Error()))
+	}
+
 }
 
 // Set the string value of a key
