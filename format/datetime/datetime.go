@@ -1,6 +1,7 @@
 package datetime
 
 import (
+	"log"
 	"time"
 )
 
@@ -24,4 +25,53 @@ func EUAtoBRShort(str string) string {
 
 func AsBRShort(dt time.Time) string {
 	return dt.Format("02/01/2006 15:04")
+}
+
+const (
+	DateTimeEUALayout = "2006-01-02 15:04:05"
+	DateTimeBRLayout  = "02/01/2006 15:04:05"
+)
+
+func MustStrBRParseDateTimeBR(str string) time.Time {
+	time, err := time.Parse(DateTimeBRLayout, str)
+	if err != nil {
+		log.Panic(err)
+	}
+	return time
+
+}
+
+func MustStrEUAParseDateTimeEUA(str string) time.Time {
+	time, err := time.Parse(DateTimeEUALayout, str)
+	if err != nil {
+		log.Panic(err)
+	}
+	return time
+
+}
+
+func MustStrEUAParseStrBR(str string) string {
+	time, err := time.Parse(DateTimeEUALayout, str)
+	if err != nil {
+		log.Panic(err)
+	}
+	return time.Format(DateTimeBRLayout)
+
+}
+
+func MustStrBRParseStrEUA(str string) string {
+	time, err := time.Parse(DateTimeBRLayout, str)
+	if err != nil {
+		log.Panic(err)
+	}
+	return time.Format(DateTimeEUALayout)
+
+}
+
+func MustStrBRParseDateTimeEUA(str string) time.Time {
+	return MustStrEUAParseDateTimeEUA(MustStrBRParseStrEUA(str))
+}
+
+func MustStrEUAParseDateTimeBR(str string) time.Time {
+	return MustStrBRParseDateTimeBR(MustStrEUAParseStrBR(str))
 }
