@@ -66,3 +66,11 @@ func MustStrBRParseDateEUA(str string) time.Time {
 func MustStrEUAParseDateBR(str string) time.Time {
 	return MustStrBRParseDateBR(MustStrEUAParseStrBR(str))
 }
+
+func MustDateEUAParseStrEUA(time time.Time) string {
+	return time.Format(DateEUALayout)
+}
+
+func MustDateBRParseStrBR(time time.Time) string {
+	return time.Format(DateBRLayout)
+}
