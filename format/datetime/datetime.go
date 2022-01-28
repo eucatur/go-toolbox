@@ -76,10 +76,10 @@ func MustStrEUAParseDateTimeBR(str string) time.Time {
 	return MustStrBRParseDateTimeBR(MustStrEUAParseStrBR(str))
 }
 
-func MustDateTimeEUAParseStrEUA(time time.Time) string {
+func DateTimeFormatStrEUA(time time.Time) string {
 	return time.Format(DateTimeEUALayout)
 }
 
-func MustDateTimeBRParseStrBR(time time.Time) string {
+func DateTimeFormatStrBR(time time.Time) string {
 	return time.Format(DateTimeBRLayout)
 }
