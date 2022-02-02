@@ -73,3 +73,9 @@ func ToInt(value float64) int {
 	}
 	return int(value*100 + 0.5)
 }
+
+func ToFloat(value int) float64 {
+	v := float64(value)
+	v = v / 100
+	return v
+}
