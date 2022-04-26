@@ -6,10 +6,19 @@ import (
 	redigo "github.com/garyburd/redigo/redis"
 )
 
+// Args is a helper for constructing command arguments from structured values.
+type Args []interface{}
+
+// Add returns the result of appending value to args.
+func (args Args) Add(value ...interface{}) Args {
+	return append(args, value...)
+}
+
 // Client is the structure used to create a redis connection client
 type Client struct {
 	Host   string
 	Port   int
+	DB     int
 	Prefix string
 	conn   *redigo.Conn
 }
@@ -17,6 +26,7 @@ type Client struct {
 // DefaultClient is a default client to connect to local redis
 var DefaultClient = Client{
 	Host:   "localhost",
+	DB:     0,
 	Port:   6379,
 	Prefix: "",
 }
@@ -27,7 +37,7 @@ func (c *Client) Conn() (conn redigo.Conn) {
 		return *c.conn
 	}
 
-	conn, err := redigo.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, c.Port))
+	conn, err := redigo.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, c.Port), redigo.DialDatabase(c.DB))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -36,8 +46,18 @@ func (c *Client) Conn() (conn redigo.Conn) {
 	return *c.conn
 }
 
+func (c *Client) Ping() {
+
+	_, err := c.Conn().Do("PING")
+
+	if err != nil {
+		panic(fmt.Errorf("não foi possível estabelecer conexão com redis. Detalhes: %s", err.Error()))
+	}
+
+}
+
 // Set the string value of a key
-func (c Client) Set(key, value string, expirationSeconds ...int) (err error) {
+func (c Client) Set(key, value string, expirationSeconds int) (err error) {
 	key = c.Prefix + key
 
 	_, err = c.Conn().Do("SET", key, value)
@@ -45,8 +65,8 @@ func (c Client) Set(key, value string, expirationSeconds ...int) (err error) {
 		return
 	}
 
-	if len(expirationSeconds) > 0 {
-		_, err = c.Conn().Do("EXPIRE", key, expirationSeconds[0])
+	if expirationSeconds > 0 {
+		_, err = c.Conn().Do("EXPIRE", key, expirationSeconds)
 	}
 
 	return
@@ -101,3 +121,71 @@ func (c Client) DeleteLike(pattern string) (err error) {
 
 	return nil
 }
+
+//Send Abre uma conexão com o Redis, executa o comando e depois a fecha
+func (c Client) Do(comando string, args ...interface{}) (interface{}, error) {
+	/*	value := c.Conn().(comando, args...)
+		if value != nil {
+			return nil, value
+		}
+		return value, nil*/
+
+	return c.Conn().Do(comando, args...)
+}
+
+//**** HM
+/*
+// HMGet the value of a key
+func (c Client) HMGet(key string) ([]string, error) {
+	return redigo.Strings(c.Conn().Do("HMGET", c.Prefix+key))
+	//values, err := c.Send("HGETALL", c.Prefix+key)
+	//if err != nil{
+	//	return []string{}, err
+	//}
+	//return redigo.Strings(values, nil), nil
+
+}
+
+
+
+// MustGet the value of a key and you can check for a boolean returned
+func (c Client) HMMustGet(key string) ([]string, bool) {
+	var err error
+	values, err := c.HMGet(key)
+	if err != nil {
+		return []string{}, false
+	}
+
+	a, err := redigo.Strings(values, nil)
+	if err != nil {
+		return []string{}, false
+	}
+	return a, true
+}
+
+// HMSet the string value of a key
+func (c Client) HMSet(values ...interface{}) (err error) {
+	//var key = fmt.Sprintf( c.Prefix , values[0])
+
+	//valuesArray := Args{}.Add(key).Add(values...)
+
+	//c.Send("HMSET", "album:1", "title", "Red", "rating", 5)
+	c.Send("HMSET", values...)
+
+	if err != nil {
+		return err
+	}
+
+	//if expirationSeconds > 0 {
+	//	_, err = c.Conn().Do("EXPIRE", key, expirationSeconds)
+	//}
+	//
+	return
+}
+
+// HMDelete a key
+func (c Client) HMDelete(key string) (err error) {
+	err = c.Delete(c.Prefix+key)
+	return
+}
+*/

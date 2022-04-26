@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"reflect"
 )
 
 func Reais(valor int64) string {
@@ -72,4 +73,23 @@ func ToInt(value float64) int {
 		return int(value*100 - 0.5)
 	}
 	return int(value*100 + 0.5)
+}
+
+func ToFloat(value int) float64 {
+	v := float64(value)
+	v = v / 100
+	return v
+}
+
+func Format(valor interface{}) string {
+	v := reflect.ValueOf(valor)
+
+	switch v.Kind() {
+	case reflect.Int64:
+		return fmt.Sprintf("%d", v.Int())
+	case reflect.Float64:
+		return fmt.Sprintf("%.2f", v.Float())
+	}
+
+	return ""
 }

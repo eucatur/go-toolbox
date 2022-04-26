@@ -51,7 +51,7 @@ func Normalize(str string) (string, error) {
 // str := RandomCharacters(4) // XwpT
 //
 func RandomCharacters(numberOfCharacters int) string {
-	letterBytes := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	letterBytes := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 	b := make([]byte, numberOfCharacters)
 	for i := range b {

@@ -69,25 +69,27 @@ func GetTryParseDate(dateTime string, layout string) (parsedDateTime time.Time) 
 	}
 
 	internalLaytout := map[string]string{
-		"ANSIC":              time.ANSIC,
-		"UnixDate":           time.UnixDate,
-		"RubyDate":           time.RubyDate,
-		"RFC822":             time.RFC822,
-		"RFC822Z":            time.RFC822Z,
-		"RFC850":             time.RFC850,
-		"RFC1123":            time.RFC1123,
-		"RFC1123Z":           time.RFC1123Z,
-		"RFC3339":            time.RFC3339,
-		"RFC3339Nano":        time.RFC3339Nano,
-		"Kitchen":            time.Kitchen,
-		"Stamp":              time.Stamp,
-		"StampMilli":         time.StampMilli,
-		"StampMicro":         time.StampMicro,
-		"StampNano":          time.StampNano,
-		"FullLayoutNow":      "2006-01-02 15:04:05.999999 -0700 -07 m=+0.000000000",
-		"LayoutTimeFullZone": "2006-01-02 15:04:05 -0700 -07",
-		"LayoutTimeZone":     "2006-01-02 15:04:05 -0700",
-		"LayoutTimeUTC":      "2006-01-02 15:04:05 -0700 UTC",
+		"ANSIC":                      time.ANSIC,
+		"UnixDate":                   time.UnixDate,
+		"RubyDate":                   time.RubyDate,
+		"RFC822":                     time.RFC822,
+		"RFC822Z":                    time.RFC822Z,
+		"RFC850":                     time.RFC850,
+		"RFC1123":                    time.RFC1123,
+		"RFC1123Z":                   time.RFC1123Z,
+		"RFC3339":                    time.RFC3339,
+		"RFC3339Nano":                time.RFC3339Nano,
+		"Kitchen":                    time.Kitchen,
+		"Stamp":                      time.Stamp,
+		"StampMilli":                 time.StampMilli,
+		"StampMicro":                 time.StampMicro,
+		"StampNano":                  time.StampNano,
+		"FullLayoutNow":              "2006-01-02 15:04:05.999999 -0700 -07 m=+0.000000000",
+		"LayoutTimeFullZone":         "2006-01-02 15:04:05 -0700 -07",
+		"LayoutTimeZone":             "2006-01-02 15:04:05 -0700",
+		"LayoutTimeUTC":              "2006-01-02 15:04:05 -0700 UTC",
+		"LayoutDateTimeCombined":     "20060102150405",
+		"LayoutDateTimePlusTimeZone": "2006-01-02T15:04:05+00:00",
 	}
 
 	if !text.StringIsEmptyOrWhiteSpace(layout) {
@@ -114,7 +116,6 @@ func GetTryParseDate(dateTime string, layout string) (parsedDateTime time.Time) 
 
 		if !tryInternal {
 
-		tryParseInternalLayout:
 			for _, internal := range internalLaytout {
 
 				tryParseDateTime, err := time.Parse(internal, dateTime)
@@ -123,8 +124,8 @@ func GetTryParseDate(dateTime string, layout string) (parsedDateTime time.Time) 
 					continue
 				}
 
-				dateTime = tryParseDateTime.Format(layout)
-				break tryParseInternalLayout
+				parsedDateTime = tryParseDateTime
+				return
 
 			}
 

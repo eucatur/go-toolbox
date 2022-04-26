@@ -19,7 +19,7 @@ func ConnectByFile(env_json_file_path string) (c redis.Conn, err error) {
 
 	address := fmt.Sprintf("%v:%v", m["REDIS_IP"].(string), m["REDIS_PORT"].(string))
 
-	c, err = redis.Dial("tcp", address, redis.DialReadTimeout(10*time.Second), redis.DialWriteTimeout(10*time.Second))
+	c, err = redis.Dial("tcp", address, redis.DialReadTimeout(10*time.Second), redis.DialWriteTimeout(10*time.Second), redis.DialDatabase(m["REDIS_PORT"].(int)))
 	if err != nil {
 		return
 	}

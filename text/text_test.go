@@ -1,8 +1,12 @@
 package text
 
 import (
+	"errors"
+	"fmt"
+	"strings"
 	"testing"
 
+	"github.com/eucatur/go-toolbox/slice"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,4 +57,41 @@ func TestNormalize(t *testing.T) {
 	text, err = Normalize("ÀBÈCÌDÒFÙ")
 	assert.Equal(t, "ABECIDOFU", text)
 	assert.Nil(t, err)
+}
+
+func TestRandomCharacters(t *testing.T) {
+	var (
+		textGenerated []string
+		text          string
+		err           error
+	)
+
+	loop := 6
+	for i := 0; i < loop; i++ {
+
+		err = nil
+
+		text = RandomCharacters(6)
+
+		if strings.EqualFold(strings.ToUpper(text), strings.ToUpper("OJNNPG")) {
+			err = errors.New("Ever is generated the 'OJNNPG' when run first")
+		}
+
+		assert.Nil(t, err)
+
+		if strings.EqualFold(strings.ToUpper(text), strings.ToUpper("SIUZYT")) {
+			err = errors.New("Ever is generated the 'SIUZYT' when run twice")
+		}
+
+		assert.Nil(t, err)
+
+		if !slice.SliceExists(textGenerated, text) {
+			textGenerated = append(textGenerated, text)
+		} else {
+			err = fmt.Errorf("Text already generated %s", text)
+		}
+
+		assert.Nil(t, err)
+
+	}
 }
