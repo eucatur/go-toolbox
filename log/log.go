@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/fatih/color"
@@ -122,16 +121,16 @@ func createFileIfNotExists(filePath string) (f *os.File) {
 }
 
 //SetOutputFiles set a new path for logs
-func SetOutputFiles(outfilePath, errfilePath string) {
-	outFile := createFileIfNotExists(outfilePath)
-	errFile := createFileIfNotExists(errfilePath)
-
-	defer outFile.Close()
-	defer errFile.Close()
-
-	syscall.Dup2(int(outFile.Fd()), 1) /* -- stdout */
-	syscall.Dup2(int(errFile.Fd()), 2) /* -- stderr */
-}
+//func SetOutputFiles(outfilePath, errfilePath string) {
+//	outFile := createFileIfNotExists(outfilePath)
+//	errFile := createFileIfNotExists(errfilePath)
+//
+//	defer outFile.Close()
+//	defer errFile.Close()
+//
+//	syscall.Dup2(int(outFile.Fd()), 1) /* -- stdout */
+//	syscall.Dup2(int(errFile.Fd()), 2) /* -- stderr */
+//}
 
 // ReturnDetailsError return the error message and the line of code with de error
 func ReturnDetailsError(e error) (buildedErrorDetails string) {
