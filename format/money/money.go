@@ -6,7 +6,7 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/eucatur/decimal"
+	"github.com/shopspring/decimal"
 )
 
 func Reais(valor int64) string {
