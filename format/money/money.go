@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+
+	"github.com/shopspring/decimal"
 )
 
 func Reais(valor int64) string {
@@ -45,10 +47,9 @@ func Reais(valor int64) string {
 //
 // Exemplos:
 //
-//  dinheiro := Round(150.141, 2)  // 150.14
-//  dinheiro := Round(150.145, 2)  // 150.15
-//  dinheiro := Round(150.146, 2)  // 150.15
-//
+//	dinheiro := Round(150.141, 2)  // 150.14
+//	dinheiro := Round(150.145, 2)  // 150.15
+//	dinheiro := Round(150.146, 2)  // 150.15
 func Round(value float64, precision int) float64 {
 	var round float64
 
@@ -92,4 +93,30 @@ func Format(valor interface{}) string {
 	}
 
 	return ""
+}
+
+// Truncate irá pegar a quantidade de casas definidas pelo parâmetro decimals
+// de acordo com a valor passado no parâmetro value.
+//
+// Exemplos:
+//
+//	amount := Truncate(150.141, 2)  // 150.14
+//	amount := Truncate(150.145234234, 3)  // 150.145
+//	amount := Truncate(100.998, 2)  // 100.99
+// package used github.com/shopspring/decimal
+func Truncate(value float64, decimals int) float64 {
+
+	d := decimal.NewFromFloat(value)
+	if value > 0 {
+		dd := d.RoundFloor(int32(decimals))
+		v, _ := dd.Float64()
+
+		return v
+	} else {
+		dd := d.RoundCeil(int32(decimals))
+		v, _ := dd.Float64()
+
+		return v
+	}
+
 }

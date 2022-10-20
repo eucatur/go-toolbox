@@ -27,6 +27,8 @@ func Round(value float64, precision int) float64 {}
 
 func ToInt(value float64) int {}
 
+Truncate(value float64, decimals int) float64 {}
+
 ## phone ##
 
 func Short(phone string) string {}
