@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -34,19 +33,11 @@ type dbConfig struct {
 }
 
 var connections = map[string]*sqlx.DB{}
-var connectionsCtx = map[string]*sql.DB{}
 
 var _config = dbConfig{}
 
 func get(filePath string) (*sqlx.DB, error) {
 	if db, found := connections[filePath]; found {
-		return db, nil
-	}
-	return nil, fmt.Errorf(`Error database not found. File path: %s`, filePath)
-}
-
-func getCtx(filePath string) (*sql.DB, error) {
-	if db, found := connectionsCtx[filePath]; found {
 		return db, nil
 	}
 	return nil, fmt.Errorf(`Error database not found. File path: %s`, filePath)
