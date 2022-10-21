@@ -12,6 +12,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/newrelic/go-agent/v3/integrations/nrmysql"
 )
 
 type dbConfig struct {
@@ -61,7 +62,7 @@ func connect(config dbConfig) (*sqlx.DB, error) {
 		))
 
 	case "mysql":
-		db, err = sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
+		db, err = sqlx.Connect("nrmysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
 			config.User,
 			config.Password,
 			config.Host,
