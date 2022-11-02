@@ -90,6 +90,7 @@ func GetTryParseDate(dateTime string, layout string) (parsedDateTime time.Time) 
 		"LayoutTimeUTC":              "2006-01-02 15:04:05 -0700 UTC",
 		"LayoutDateTimeCombined":     "20060102150405",
 		"LayoutDateTimePlusTimeZone": "2006-01-02T15:04:05+00:00",
+		"LayoutDateTimeJustInfoT":    "2006-01-02T15:04:05",
 	}
 
 	if !text.StringIsEmptyOrWhiteSpace(layout) {
