@@ -95,3 +95,80 @@ func TestRandomCharacters(t *testing.T) {
 
 	}
 }
+
+func TestStringIsEmptyOrWhiteSpace(t *testing.T) {
+	tests := []struct {
+		name          string
+		valueForTests string
+		expected      bool
+	}{
+		{
+			name:          "Com informação",
+			valueForTests: "Dolor sit non ipsum nulla.",
+			expected:      false,
+		},
+		{
+			name:          "Nada informado",
+			valueForTests: "",
+			expected:      true,
+		},
+		{
+			name:          "Com espaço em branco",
+			valueForTests: " ",
+			expected:      true,
+		},
+		{
+			name:          "Vários espaços em branco",
+			valueForTests: "    ",
+			expected:      true,
+		},
+		{
+			name:          "Apenas Uma informação",
+			valueForTests: "a",
+			expected:      false,
+		},
+		{
+			name:          "Apenas com acento",
+			valueForTests: "´",
+			expected:      false,
+		},
+		{
+			name:          "Apenas com quebra de linha",
+			valueForTests: "\n",
+			expected:      true,
+		},
+		{
+			name:          "Espaço em branco e quebra de linha",
+			valueForTests: "  \n   ",
+			expected:      true,
+		},
+		{
+			name:          "Com tab",
+			valueForTests: "\t",
+			expected:      true,
+		},
+		{
+			name:          "Com tab e quebra de linha",
+			valueForTests: "\t\n",
+			expected:      true,
+		},
+		{
+			name:          "Com tab e quebra de linha e espaço",
+			valueForTests: "\t\n  ",
+			expected:      true,
+		},
+		{
+			name:          "Quebra de linha",
+			valueForTests: "\r",
+			expected:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := StringIsEmptyOrWhiteSpace(tt.valueForTests); got != tt.expected {
+				t.Errorf("StringIsEmptyOrWhiteSpace() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
