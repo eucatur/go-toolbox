@@ -77,3 +77,14 @@ func CheckResourceStructsSetted(resource any) (err error) {
 
 	return
 }
+
+// CheckStructFilled
+// irá utiliza a verificação de interface e campos de uma struct
+func CheckStructFilled(resources any) error {
+
+	return errors.Append(
+		CheckResourceInterfacesSetted(resources),
+		CheckResourceStructsSetted(resources),
+	)
+
+}

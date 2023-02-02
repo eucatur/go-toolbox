@@ -152,3 +152,71 @@ func TestCheckResourceStructsSetted(t *testing.T) {
 
 	require.Nil(t, err, "Structs declaradas não deve ocorrer error")
 }
+
+func TestCheckStructFilled(t *testing.T) {
+
+	type iTest interface {
+		TestFunc()
+	}
+
+	type testStrct struct {
+		field string
+	}
+
+	type testService struct {
+		Test      iTest
+		Test1     iTest
+		TTee      iTest
+		StrctTest testStrct
+	}
+
+	tests := []struct {
+		name      string
+		resources testService
+		wantErr   bool
+	}{
+		{
+			name: "Struct vazia",
+			resources: testService{
+				Test:      nil,
+				Test1:     nil,
+				TTee:      nil,
+				StrctTest: testStrct{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "Struct preenchida sem preencher as interfaces",
+			resources: testService{
+				Test:  nil,
+				Test1: nil,
+				TTee:  nil,
+				StrctTest: testStrct{
+					field: "Ad culpa sint quis anim est proident excepteur Lorem ipsum.",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "Struct preenchida completamente",
+			resources: testService{
+				Test:  &struct{ iTest }{},
+				Test1: &struct{ iTest }{},
+				TTee:  &struct{ iTest }{},
+				StrctTest: testStrct{
+					field: "Ad culpa sint quis anim est proident excepteur Lorem ipsum.",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			err := CheckStructFilled(&tt.resources)
+
+			require.Equal(t, tt.wantErr, err != nil)
+
+		})
+	}
+}

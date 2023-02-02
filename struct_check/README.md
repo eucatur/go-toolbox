@@ -6,3 +6,6 @@ func CheckResourceInterfacesSetted(resource any) (err error) {}
 
 ## CheckResourceStructsSetted ##
 func CheckResourceStructsSetted(resource any) (err error) {}
+
+## CheckStructFilled ##
+func CheckStructFilled(resources any) error {}
