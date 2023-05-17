@@ -10,7 +10,7 @@ import (
 // Atente-se ao utilizar essa função:
 // se a struct estiver como ponteiro informe-a diretamente
 // se a struct não estiver como ponteiro informe-a por referência: Ex.: &struct
-func CheckResourceInterfacesSetted(resource any) (err error) {
+func CheckResourceInterfacesSetted(resource interface{}) (err error) {
 
 	defer func() {
 		errRecover := recover()
@@ -46,7 +46,7 @@ func CheckResourceInterfacesSetted(resource any) (err error) {
 // Atente-se ao utilizar essa função:
 // se a struct estiver como ponteiro informe-a diretamente
 // se a struct não estiver como ponteiro informe-a por referência: Ex.: &struct
-func CheckResourceStructsSetted(resource any) (err error) {
+func CheckResourceStructsSetted(resource interface{}) (err error) {
 
 	defer func() {
 		errRecover := recover()
