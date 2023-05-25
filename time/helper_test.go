@@ -330,4 +330,8 @@ func TestGetTryParseDate(t *testing.T) {
 	parsed = GetTryParseDate("2022-10-28T09:02", "").Format("2006-01-02 15:04:05")
 
 	assert.Equal("2022-10-28 09:02:00", parsed)
+	
+	parsed = GetTryParseDate("24/05/2023T20:17", "").Format("2006-01-02 15:04:05")
+
+	assert.Equal("2023-05-24 20:17:00", parsed)
 }
