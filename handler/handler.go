@@ -5,9 +5,8 @@ import (
 	"reflect"
 
 	"github.com/eucatur/go-toolbox/log"
-
 	"github.com/eucatur/go-toolbox/validator"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/mcuadros/go-defaults"
 )
 
