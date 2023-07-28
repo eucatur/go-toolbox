@@ -1,0 +1,37 @@
+go 1.20
+
+use (
+	./age
+	./api
+	./cache
+	./card
+	./check
+	./cookie
+	./crypt
+	./database
+	./env
+	./format
+	./handler
+	./ibge
+	./json
+	./json2env
+	./jwt
+	./log
+	./numbers
+	./path
+	./platform
+	./redis
+	./rediscon
+	./returns
+	./signature
+	./slice
+	./strings
+	./struct_check
+	./template
+	./text
+	./time
+	./user_agent
+	./validator
+	./viacep
+	./xdefer
+)
