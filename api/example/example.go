@@ -3,8 +3,9 @@ package main
 import (
 	"net/http"
 
+	"github.com/labstack/echo/v4"
+
 	"github.com/eucatur/go-toolbox/api"
-	"github.com/labstack/echo"
 )
 
 func main() {
