@@ -93,6 +93,7 @@ func GetTryParseDate(dateTime string, layout string) (parsedDateTime time.Time) 
 		"LayoutDateTimeJustInfoT":            "2006-01-02T15:04:05",
 		"LayoutDateTimeWithShortTime":        "2006-01-02T15:04",
 		"LayoutDateTimeWithShortTimeWithBar": "02/01/2006T15:04",
+		"LayoutDateTimeWithSpaceTimeWithTimezone": "2006-01-02 15:04:05-07:00",
 	}
 
 	if !text.StringIsEmptyOrWhiteSpace(layout) {
