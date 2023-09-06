@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/eucatur/go-toolbox/json"
@@ -15,7 +16,7 @@ import (
 	_ "github.com/newrelic/go-agent/v3/integrations/nrmysql"
 )
 
-type dbConfig struct {
+type DBConfig struct {
 	FilePath     string
 	PathToDBFile string `json:"path_to_db_file"`
 	Type         string `json:"type"`
@@ -35,7 +36,7 @@ type dbConfig struct {
 
 var connections = map[string]*sqlx.DB{}
 
-var _config = dbConfig{}
+var _config = DBConfig{}
 
 func get(filePath string) (*sqlx.DB, error) {
 	if db, found := connections[filePath]; found {
@@ -44,7 +45,22 @@ func get(filePath string) (*sqlx.DB, error) {
 	return nil, fmt.Errorf(`Error database not found. File path: %s`, filePath)
 }
 
-func connect(config dbConfig) (*sqlx.DB, error) {
+func getDataConnection(config DBConfig) string {
+	return fmt.Sprintf("%s-%s-%s-%d", config.Type, config.DataBase, config.Host, config.Port)
+}
+
+func getConnection(config DBConfig) (*sqlx.DB, error) {
+
+	dataConnection := getDataConnection(config)
+
+	if db, found := connections[dataConnection]; found {
+		return db, nil
+	}
+
+	return nil, fmt.Errorf("error database not found by data connection. Datas of connection: %s", dataConnection)
+}
+
+func connect(config DBConfig) (*sqlx.DB, error) {
 	var (
 		db  *sqlx.DB
 		err error
@@ -87,7 +103,16 @@ func connect(config dbConfig) (*sqlx.DB, error) {
 	db.SetMaxIdleConns(config.MaxIdleConnection)
 	db.SetConnMaxLifetime(maxLifeTime * time.Minute)
 
-	connections[config.FilePath] = db
+	if !strings.EqualFold(config.FilePath, "") {
+
+		connections[config.FilePath] = db
+
+	} else {
+
+		connections[getDataConnection(config)] = db
+
+	}
+
 	return db, nil
 }
 
@@ -100,7 +125,7 @@ func GetByFile(filePath string) (*sqlx.DB, error) {
 	}
 
 	var (
-		config dbConfig
+		config DBConfig
 		err    error
 	)
 
@@ -122,4 +147,16 @@ func MustGetByFile(filePath string) *sqlx.DB {
 		panic(err)
 	}
 	return db
+}
+
+func GetConnection(config DBConfig) (*sqlx.DB, error) {
+
+	if db, err := getConnection(config); err == nil {
+		return db, nil
+	}
+
+	_config = config
+
+	return connect(config)
+
 }
