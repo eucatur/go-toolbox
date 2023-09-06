@@ -1,1 +1,4 @@
+github.com/eucatur/go-toolbox/json v1.0.0 h1:HBkrCjMXQbqu8hDeNivHiObjI9cZjIEf8D6fmFW6YdI=
+github.com/eucatur/go-toolbox/json v1.0.0/go.mod h1:syV/b9S6YC/sqiu64BSCk4FrICW+hZ0sSGiQ0mx9tXs=
 github.com/garyburd/redigo v1.6.4 h1:LFu2R3+ZOPgSMWMOL+saa/zXRjw0ID2G8FepO53BGlg=
+github.com/garyburd/redigo v1.6.4/go.mod h1:rTb6epsqigu3kYKBnaF028A7Tf/Aw5s0cqA47doKKqw=

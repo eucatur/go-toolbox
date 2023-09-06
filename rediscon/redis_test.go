@@ -5,9 +5,11 @@ import (
 )
 
 func TestLoadFile(t *testing.T) {
-	err := LoadFile("test.json")
 
-	if err != nil {
-		t.Error(err)
+	conn := MustConnectByFile("redis.json")
+
+	if conn == nil {
+		t.Error("conexão com redis não retornada")
 	}
+
 }
