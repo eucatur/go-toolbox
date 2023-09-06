@@ -1,2 +1,6 @@
+github.com/eucatur/go-toolbox/redis v1.0.0 h1:AQQjdlxFe3XBalPqN3a/Q5JEsa6SiOvy9p+DS6JPJxk=
+github.com/eucatur/go-toolbox/redis v1.0.0/go.mod h1:6kvyNz0FV8kFYdW9McT9voUCtklFDtIWf6wePw9G1n4=
+github.com/garyburd/redigo v1.6.4 h1:LFu2R3+ZOPgSMWMOL+saa/zXRjw0ID2G8FepO53BGlg=
+github.com/garyburd/redigo v1.6.4/go.mod h1:rTb6epsqigu3kYKBnaF028A7Tf/Aw5s0cqA47doKKqw=
 github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaRUnok+kx1WdO15EQc=
 github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=
