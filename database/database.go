@@ -45,6 +45,20 @@ func get(filePath string) (*sqlx.DB, error) {
 	return nil, fmt.Errorf(`Error database not found. File path: %s`, filePath)
 }
 
+func SetConnectionByFile(filePath string, db *sqlx.DB) {
+	
+	if strings.EqualFold(filePath, "") || db == nil {
+		return
+	}
+
+	if _, found := connections[filePath]; found {
+		return
+	}
+
+	connections[filePath] = db
+	
+}
+
 func getDataConnection(config DBConfig) string {
 	return fmt.Sprintf("%s-%s-%s-%d", config.Type, config.DataBase, config.Host, config.Port)
 }
@@ -58,6 +72,22 @@ func getConnection(config DBConfig) (*sqlx.DB, error) {
 	}
 
 	return nil, fmt.Errorf("error database not found by data connection. Datas of connection: %s", dataConnection)
+}
+
+func SetConnectionByConfig(config DBConfig, db *sqlx.DB) {
+
+	if db == nil {
+		return
+	}
+
+	dataConnection := getDataConnection(config)
+
+	if _, found := connections[dataConnection]; found {
+		return
+	}
+
+	connections[dataConnection] = db
+
 }
 
 func connect(config DBConfig) (*sqlx.DB, error) {
