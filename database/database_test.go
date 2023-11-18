@@ -11,7 +11,6 @@ import (
 )
 
 func TestGetByFile(t *testing.T) {
-	t.Skip("")
 	_, err := GetByFile("mysql-example.json")
 	if err != nil {
 		t.Error(err)
