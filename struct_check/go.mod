@@ -1,4 +1,4 @@
-module github.com/eucatur/go-toolbox/structcheck
+module github.com/eucatur/go-toolbox/struct_check
 
 go 1.20
 
