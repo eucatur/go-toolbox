@@ -11,6 +11,7 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/eucatur/go-toolbox/slice v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5
 	github.com/kr/text v0.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
