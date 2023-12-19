@@ -1,11 +1,13 @@
 package redis
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
 	"testing"
 
+	"github.com/eucatur/go-toolbox/text"
 	redigo "github.com/gomodule/redigo/redis"
 	"github.com/rafaeljusto/redigomock/v3"
 	"github.com/stretchr/testify/require"
@@ -13,11 +15,11 @@ import (
 
 func TestClient_Ping(t *testing.T) {
 	type fields struct {
-		Host            string
-		Port            int
-		DB              int
-		Prefix          string
-		ConnectionRedis redigo.Conn
+		Host           string
+		Port           int
+		DB             int
+		Prefix         string
+		PoolConnection redigo.Pool
 	}
 	tests := []struct {
 		name         string
@@ -33,9 +35,9 @@ func TestClient_Ping(t *testing.T) {
 			},
 			expectedTest: func(test *testing.T, connRedigoMock *redigomock.Conn, cmdRedis *redigomock.Cmd, clientForTest *Client) {
 
-				require.Panics(t, func() {
-					clientForTest.Ping()
-				})
+				err := clientForTest.Ping()
+
+				require.Error(t, err)
 
 				if connRedigoMock.Stats(cmdRedis) != 1 {
 					t.Error("comando não encontrado")
@@ -69,22 +71,30 @@ func TestClient_Ping(t *testing.T) {
 
 			cmd := &redigomock.Cmd{}
 
-			defer conn.Close()
-
 			f := fields{
-				ConnectionRedis: conn,
+				PoolConnection: redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return conn, nil
+					},
+				},
 			}
+
+			defer f.PoolConnection.Close()
+
+			connFromPool := f.PoolConnection.Get()
+
+			defer connFromPool.Close()
 
 			if tt.prepareMock != nil {
 				cmd = tt.prepareMock(&f, conn)
 			}
 
 			c := &Client{
-				Host:            f.Host,
-				Port:            f.Port,
-				DB:              f.DB,
-				Prefix:          f.Prefix,
-				ConnectionRedis: &f.ConnectionRedis,
+				Host:   f.Host,
+				Port:   f.Port,
+				DB:     f.DB,
+				Prefix: f.Prefix,
+				pool:   &f.PoolConnection,
 			}
 
 			if tt.expectedTest != nil {
@@ -96,11 +106,11 @@ func TestClient_Ping(t *testing.T) {
 
 func TestClient_Set(t *testing.T) {
 	type fields struct {
-		Host            string
-		Port            int
-		DB              int
-		Prefix          string
-		ConnectionRedis redigo.Conn
+		Host           string
+		Port           int
+		DB             int
+		Prefix         string
+		PoolConnection redigo.Pool
 	}
 	type args struct {
 		key               string
@@ -167,7 +177,11 @@ func TestClient_Set(t *testing.T) {
 			defer conn.Close()
 
 			f := fields{
-				ConnectionRedis: conn,
+				PoolConnection: redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return conn, nil
+					},
+				},
 			}
 
 			if tt.prepareMock != nil {
@@ -175,11 +189,11 @@ func TestClient_Set(t *testing.T) {
 			}
 
 			c := Client{
-				Host:            f.Host,
-				Port:            f.Port,
-				DB:              f.DB,
-				Prefix:          f.Prefix,
-				ConnectionRedis: &f.ConnectionRedis,
+				Host:   f.Host,
+				Port:   f.Port,
+				DB:     f.DB,
+				Prefix: f.Prefix,
+				pool:   &f.PoolConnection,
 			}
 			if err := c.Set(tt.args.key, tt.args.value, tt.args.expirationSeconds); (err != nil) != tt.wantErr {
 				t.Errorf("Client.Set() error = %v, wantErr %v", err, tt.wantErr)
@@ -195,11 +209,11 @@ func TestClient_Set(t *testing.T) {
 
 func TestClient_Get(t *testing.T) {
 	type fields struct {
-		Host            string
-		Port            int
-		DB              int
-		Prefix          string
-		ConnectionRedis redigo.Conn
+		Host           string
+		Port           int
+		DB             int
+		Prefix         string
+		PoolConnection redigo.Pool
 	}
 	type args struct {
 		key string
@@ -235,15 +249,19 @@ func TestClient_Get(t *testing.T) {
 			defer conn.Close()
 
 			f := fields{
-				ConnectionRedis: conn,
+				PoolConnection: redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return conn, nil
+					},
+				},
 			}
 
 			c := Client{
-				Host:            f.Host,
-				Port:            f.Port,
-				DB:              f.DB,
-				Prefix:          f.Prefix,
-				ConnectionRedis: &f.ConnectionRedis,
+				Host:   f.Host,
+				Port:   f.Port,
+				DB:     f.DB,
+				Prefix: f.Prefix,
+				pool:   &f.PoolConnection,
 			}
 
 			if tt.prepareMock != nil {
@@ -270,11 +288,11 @@ func TestClient_Get(t *testing.T) {
 
 func TestClient_MustGet(t *testing.T) {
 	type fields struct {
-		Host            string
-		Port            int
-		DB              int
-		Prefix          string
-		ConnectionRedis redigo.Conn
+		Host           string
+		Port           int
+		DB             int
+		Prefix         string
+		PoolConnection redigo.Pool
 	}
 	type args struct {
 		key string
@@ -321,7 +339,11 @@ func TestClient_MustGet(t *testing.T) {
 			defer conn.Close()
 
 			f := fields{
-				ConnectionRedis: conn,
+				PoolConnection: redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return conn, nil
+					},
+				},
 			}
 
 			if tt.prepareMock != nil {
@@ -330,11 +352,11 @@ func TestClient_MustGet(t *testing.T) {
 			}
 
 			c := Client{
-				Host:            f.Host,
-				Port:            f.Port,
-				DB:              f.DB,
-				Prefix:          f.Prefix,
-				ConnectionRedis: &f.ConnectionRedis,
+				Host:   f.Host,
+				Port:   f.Port,
+				DB:     f.DB,
+				Prefix: f.Prefix,
+				pool:   &f.PoolConnection,
 			}
 
 			gotValue, gotOk := c.MustGet(tt.args.key)
@@ -355,11 +377,11 @@ func TestClient_MustGet(t *testing.T) {
 
 func TestClient_Delete(t *testing.T) {
 	type fields struct {
-		Host            string
-		Port            int
-		DB              int
-		Prefix          string
-		ConnectionRedis redigo.Conn
+		Host           string
+		Port           int
+		DB             int
+		Prefix         string
+		PoolConnection redigo.Pool
 	}
 	type args struct {
 		key string
@@ -405,7 +427,11 @@ func TestClient_Delete(t *testing.T) {
 			defer conn.Close()
 
 			f := fields{
-				ConnectionRedis: conn,
+				PoolConnection: redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return conn, nil
+					},
+				},
 			}
 
 			if tt.prepareMock != nil {
@@ -413,11 +439,11 @@ func TestClient_Delete(t *testing.T) {
 			}
 
 			c := Client{
-				Host:            f.Host,
-				Port:            f.Port,
-				DB:              f.DB,
-				Prefix:          f.Prefix,
-				ConnectionRedis: &f.ConnectionRedis,
+				Host:   f.Host,
+				Port:   f.Port,
+				DB:     f.DB,
+				Prefix: f.Prefix,
+				pool:   &f.PoolConnection,
 			}
 			if err := c.Delete(tt.args.key); (err != nil) != tt.wantErr {
 				t.Errorf("Client.Delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -432,11 +458,11 @@ func TestClient_Delete(t *testing.T) {
 
 func TestClient_DeleteLike(t *testing.T) {
 	type fields struct {
-		Host            string
-		Port            int
-		DB              int
-		Prefix          string
-		ConnectionRedis redigo.Conn
+		Host           string
+		Port           int
+		DB             int
+		Prefix         string
+		PoolConnection redigo.Pool
 	}
 	type args struct {
 		pattern string
@@ -506,7 +532,11 @@ func TestClient_DeleteLike(t *testing.T) {
 			defer conn.Close()
 
 			f := fields{
-				ConnectionRedis: conn,
+				PoolConnection: redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return conn, nil
+					},
+				},
 			}
 
 			if tt.prepareMock != nil {
@@ -514,11 +544,11 @@ func TestClient_DeleteLike(t *testing.T) {
 			}
 
 			c := Client{
-				Host:            f.Host,
-				Port:            f.Port,
-				DB:              f.DB,
-				Prefix:          f.Prefix,
-				ConnectionRedis: &f.ConnectionRedis,
+				Host:   f.Host,
+				Port:   f.Port,
+				DB:     f.DB,
+				Prefix: f.Prefix,
+				pool:   &f.PoolConnection,
 			}
 			if err := c.DeleteLike(tt.args.pattern); (err != nil) != tt.wantErr {
 				t.Errorf("Client.DeleteLike() error = %v, wantErr %v", err, tt.wantErr)
@@ -533,11 +563,11 @@ func TestClient_DeleteLike(t *testing.T) {
 
 func TestClient_Do(t *testing.T) {
 	type fields struct {
-		Host            string
-		Port            int
-		DB              int
-		Prefix          string
-		ConnectionRedis redigo.Conn
+		Host           string
+		Port           int
+		DB             int
+		Prefix         string
+		PoolConnection redigo.Pool
 	}
 	type args struct {
 		comando string
@@ -591,7 +621,11 @@ func TestClient_Do(t *testing.T) {
 			defer conn.Close()
 
 			f := fields{
-				ConnectionRedis: conn,
+				PoolConnection: redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return conn, nil
+					},
+				},
 			}
 
 			if tt.prepareMock != nil {
@@ -599,11 +633,11 @@ func TestClient_Do(t *testing.T) {
 			}
 
 			c := Client{
-				Host:            f.Host,
-				Port:            f.Port,
-				DB:              f.DB,
-				Prefix:          f.Prefix,
-				ConnectionRedis: &f.ConnectionRedis,
+				Host:   f.Host,
+				Port:   f.Port,
+				DB:     f.DB,
+				Prefix: f.Prefix,
+				pool:   &f.PoolConnection,
 			}
 			got, err := c.Do(tt.args.comando, tt.args.args...)
 			if (err != nil) != tt.wantErr {
@@ -617,6 +651,157 @@ func TestClient_Do(t *testing.T) {
 			if conn.Stats(cmd) != 1 {
 				t.Error("comando não localizado")
 			}
+		})
+	}
+}
+
+func TestClient_getConnectionFromPool(t *testing.T) {
+	type fields struct {
+		Host        string
+		Port        int
+		DB          int
+		Prefix      string
+		MaxIdle     int
+		MaxActive   int
+		IdleTimeout int
+		pool        *redigo.Pool
+
+		_connectionStatemented redigo.Conn
+	}
+	tests := []struct {
+		name        string
+		wantConn    func(tt *testing.T, f fields, conn redigo.Conn)
+		prepareMock func(f *fields, connMock *redigomock.Conn)
+	}{
+		{
+			name: "Falha ao estabelecer conexão irá printar a infromação",
+			wantConn: func(tt *testing.T, f fields, conn redigo.Conn) {
+
+				require.Error(tt, conn.Err())
+
+			},
+		},
+		{
+			name: "Conexão com servidor estabelecida com sucesso",
+			wantConn: func(tt *testing.T, f fields, conn redigo.Conn) {
+
+				require.NoError(tt, conn.Err())
+			},
+			prepareMock: func(f *fields, connMock *redigomock.Conn) {
+
+				f.pool = &redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return connMock, nil
+					},
+				}
+			},
+		},
+		{
+			name: "Conexão fechada no pool - deverá retornar uma nova conexão",
+			wantConn: func(tt *testing.T, f fields, conn redigo.Conn) {
+
+				require.NoError(tt, conn.Err())
+			},
+			prepareMock: func(f *fields, connMock *redigomock.Conn) {
+
+				f.pool = &redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return connMock, nil
+					},
+				}
+
+				defer connMock.Close()
+
+			},
+		},
+		{
+			/*
+				ATENÇÃO: ESSE TESTE FAZ-SE NECESSÁRIO RODAR EM INFRA DEVIDO NA RETENTATIVA DE OBTER UM NOVO
+				POOL DE CONEXÃO SER DESCONSIDERADO O MOCK PARAMETRIZA E APLICAR UMA CONEXÃO REAL.
+
+				COMO SUGESTÃO PARA RODAR INFRA BASTA LEVANTAR UM CONTAINER DOCKER DO REDIS E PARAMETRIZAR
+				AS INFORMAÇÕES DE CONEXÃO NESTE TESTE NA SEÇÃO prepareMock nas linhas:
+				f.Host
+				f.Port
+				f.DB
+
+			*/
+			name: "Pool de conexões fechada, iremos instanciar novamente e deverá retornar a conexão",
+			wantConn: func(tt *testing.T, f fields, conn redigo.Conn) {
+
+				isCheckResultTest := !text.StringIsEmptyOrWhiteSpace(f.Host) &&
+					f.Port > 0 &&
+					f.DB > 0
+
+				if isCheckResultTest {
+
+					require.NoError(tt, conn.Err())
+
+				}
+
+			},
+			prepareMock: func(f *fields, connMock *redigomock.Conn) {
+
+				f.Host = "localhost"
+				f.Port = 6380
+				f.DB = 8
+
+				f.pool = &redigo.Pool{
+					DialContext: func(ctx context.Context) (redigo.Conn, error) {
+						return connMock, nil
+					},
+				}
+
+				defer f.pool.Close()
+			},
+		},
+		{
+			name: "Usando pool de conexão com conexão declarada",
+			wantConn: func(tt *testing.T, f fields, conn redigo.Conn) {
+
+				_, err := conn.Do("PING")
+
+				require.NoError(tt, err)
+
+			},
+			prepareMock: func(f *fields, connMock *redigomock.Conn) {
+
+				connMock.Command("PING").Expect("PONG")
+
+				f._connectionStatemented = connMock
+
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			conn := redigomock.NewConn()
+
+			defer conn.Close()
+
+			f := fields{}
+
+			if tt.prepareMock != nil {
+				tt.prepareMock(&f, conn)
+			}
+
+			c := &Client{
+				Host:            f.Host,
+				Port:            f.Port,
+				DB:              f.DB,
+				Prefix:          f.Prefix,
+				MaxIdle:         f.MaxIdle,
+				MaxActive:       f.MaxActive,
+				IdleTimeout:     f.IdleTimeout,
+				pool:            f.pool,
+				ConnStatemented: f._connectionStatemented,
+			}
+
+			gotConn := c.GetConnectionFromPool()
+
+			tt.wantConn(t, f, gotConn)
+
 		})
 	}
 }

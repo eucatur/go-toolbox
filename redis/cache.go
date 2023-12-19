@@ -1,8 +1,15 @@
 package redis
 
 import (
+	"context"
 	"fmt"
+	"log"
+	"slices"
+	"strings"
+	"time"
 
+	commandredis "github.com/eucatur/go-toolbox/redis/command_redis"
+	"github.com/eucatur/go-toolbox/text"
 	redigo "github.com/gomodule/redigo/redis"
 )
 
@@ -20,53 +27,175 @@ type Client struct {
 	Port            int
 	DB              int
 	Prefix          string
-	ConnectionRedis *redigo.Conn
+	MaxIdle         int
+	MaxActive       int
+	IdleTimeout     int
+	pool            *redigo.Pool
+	ConnStatemented redigo.Conn
+
+	_exitRecursive bool
 }
 
 // DefaultClient is a default client to connect to local redis
-var DefaultClient = Client{
+var DefaultClient = &Client{
 	Host:   "localhost",
 	DB:     0,
 	Port:   6379,
 	Prefix: "",
 }
 
-// Conn returns a redis connection to execute commands
-func (c *Client) Conn() (conn redigo.Conn) {
-	if c.ConnectionRedis != nil {
-		return *c.ConnectionRedis
+func (c *Client) setDefaultParamsConnection() {
+
+	const (
+		defatulMaxIdle     = 30
+		defaultMaxActive   = 30
+		defaultIdleTimeout = 300
+	)
+
+	if c.MaxIdle <= 0 {
+		c.MaxIdle = defatulMaxIdle
 	}
 
-	conn, err := redigo.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, c.Port), redigo.DialDatabase(c.DB))
-	if err != nil {
-		panic(err.Error())
+	if c.MaxActive <= 0 {
+		c.MaxActive = defaultMaxActive
 	}
 
-	c.ConnectionRedis = &conn
-	return *c.ConnectionRedis
+	if c.IdleTimeout <= 0 {
+		c.IdleTimeout = defaultIdleTimeout
+	}
+
 }
 
-func (c *Client) Ping() {
+func NewConnection(param Client) redigo.Conn {
 
-	_, err := c.Conn().Do("PING")
+	client := &param
+
+	return client.GetConnectionFromPool()
+
+}
+
+func (c *Client) GetConnectionFromPool() (conn redigo.Conn) {
+
+	checkRecreatePool := func(connection redigo.Conn) bool {
+
+		if connection == nil {
+			return false
+		}
+
+		err := connection.Err()
+
+		if err == nil {
+			return false
+		}
+
+		const (
+			msgRedigoPoolOverload = "redigo: connection pool exhausted"
+			msgRedigoPoolClosed   = "redigo: get on closed pool"
+		)
+
+		isErrorReasonToRecreatePool := []string{
+			msgRedigoPoolClosed,
+			msgRedigoPoolOverload,
+		}
+
+		errMsg := strings.ToLower(connection.Err().Error())
+
+		switch {
+		case strings.EqualFold(errMsg, msgRedigoPoolOverload):
+			log.Default().Printf("Recriado o pool de conexão devido estar sobrecarregado. Para evitar considere rever os parâmetros definido para MaxIdle, MaxActive e IdleTimeout\n")
+		}
+
+		return slices.Contains(isErrorReasonToRecreatePool, errMsg)
+	}
+
+	c.setDefaultParamsConnection()
+
+	if c.pool == nil {
+
+		c.pool = &redigo.Pool{
+			DialContext: func(ctx context.Context) (redigo.Conn, error) {
+
+				if c.ConnStatemented != nil {
+
+					return c.ConnStatemented, nil
+				}
+
+				conn, err := redigo.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, c.Port), redigo.DialDatabase(c.DB))
+
+				if err != nil {
+
+					msgErr := fmt.Sprintf("Falha ao estabelecer conexão com servidor de cache %s:%d. Detalhes: %s\n", c.Host, c.Port, err.Error())
+
+					invalidDataConnection := []bool{
+						text.StringIsEmptyOrWhiteSpace(c.Host),
+						c.Port <= 0,
+					}
+
+					if slices.Contains(invalidDataConnection, true) {
+						msgErr += ". Verique se as informações de Host e/ou Port foram informadas\n"
+					}
+
+					log.Default().Printf(msgErr)
+
+					return nil, err
+				}
+
+				return conn, nil
+			},
+			MaxIdle:     c.MaxIdle,
+			MaxActive:   c.MaxActive,
+			IdleTimeout: time.Duration(c.IdleTimeout * int(time.Second)),
+		}
+
+	}
+
+	conn = c.pool.Get()
+
+	if checkRecreatePool(conn) {
+
+		if c._exitRecursive {
+			return
+		}
+
+		c.pool = nil
+		conn = c.GetConnectionFromPool()
+
+		if checkRecreatePool(conn) {
+			c._exitRecursive = true
+		}
+
+	}
+
+	return conn
+
+}
+
+// Conn returns a redis connection to execute commands
+func (c *Client) Conn() (conn redigo.Conn) {
+	return c.GetConnectionFromPool()
+}
+
+func (c *Client) Ping() (err error) {
+
+	_, err = c.Conn().Do(commandredis.Ping.String())
 
 	if err != nil {
-		panic(fmt.Errorf("não foi possível estabelecer conexão com redis. Detalhes: %s", err.Error()))
+		return
 	}
+
+	return
 
 }
 
 // Set the string value of a key
 func (c Client) Set(key, value string, expirationSeconds int) (err error) {
+
 	key = c.Prefix + key
 
-	_, err = c.Conn().Do("SET", key, value)
-	if err != nil {
-		return
-	}
+	_, err = c.Conn().Do(commandredis.Set.String(), key, value)
 
 	if expirationSeconds > 0 {
-		_, err = c.Conn().Do("EXPIRE", key, expirationSeconds)
+		_, err = c.Conn().Do(commandredis.Expire.String(), key, expirationSeconds)
 	}
 
 	return
@@ -74,7 +203,7 @@ func (c Client) Set(key, value string, expirationSeconds int) (err error) {
 
 // Get the value of a key
 func (c Client) Get(key string) (value string, err error) {
-	return redigo.String(c.Conn().Do("GET", c.Prefix+key))
+	return redigo.String(c.Conn().Do(commandredis.Get.String(), c.Prefix+key))
 }
 
 // MustGet the value of a key and you can check for a boolean returned
@@ -90,7 +219,7 @@ func (c Client) MustGet(key string) (value string, ok bool) {
 
 // Delete a key
 func (c Client) Delete(key string) (err error) {
-	_, err = c.Conn().Do("DEL", c.Prefix+key)
+	_, err = c.Conn().Do(commandredis.Delete.String(), c.Prefix+key)
 	return
 }
 
@@ -98,7 +227,7 @@ func (c Client) Delete(key string) (err error) {
 func (c Client) DeleteLike(pattern string) (err error) {
 	iter := 0
 	for {
-		arr, err := redigo.Values(c.Conn().Do("SCAN", iter, "MATCH", "*"+pattern+"*"))
+		arr, err := redigo.Values(c.Conn().Do(commandredis.Scan.String(), iter, commandredis.Match.String(), "*"+pattern+"*"))
 		if err != nil {
 			return fmt.Errorf("error retrieving '%s' keys", c.Prefix+pattern)
 		}
@@ -107,7 +236,7 @@ func (c Client) DeleteLike(pattern string) (err error) {
 		keys, _ := redigo.Strings(arr[1], nil)
 
 		for _, key := range keys {
-			_, err = c.Conn().Do("DEL", key)
+			_, err = c.Conn().Do(commandredis.Delete.String(), key)
 
 			if err != nil {
 				return err
@@ -129,6 +258,5 @@ func (c Client) Do(comando string, args ...interface{}) (interface{}, error) {
 			return nil, value
 		}
 		return value, nil*/
-
 	return c.Conn().Do(comando, args...)
 }
