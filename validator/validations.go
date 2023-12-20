@@ -63,6 +63,8 @@ func init() {
 	validator.addValidation("uf", vUF)
 	validator.addValidation("ufwithex", vUFWithEX)
 	validator.addValidation("ipv4", vIPv4)
+	validator.addValidation("ipv6", vIPv6)
+	validator.addValidation("ipv46", vIPv46)
 }
 
 func vMsg(vf vField) string {
@@ -354,5 +356,26 @@ func vIPv4(vf vField) string {
 			return "Informe um ÌP válido"
 		}
 	}
+	return ""
+}
+
+func vIPv6(vf vField) string {
+	if value := vf.toString(); value != "" {
+		if !regexp.MustCompile(`^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$`).MatchString(value) {
+			return "Informe um IP válido"
+		}
+	}
+	return ""
+}
+
+func vIPv46(vf vField) string {
+
+	msgIPv4 := vIPv4(vf)
+	msgIPv6 := vIPv6(vf)
+
+	if !strings.EqualFold(msgIPv4, "") && !strings.EqualFold(msgIPv6, "") {
+		return "Informe um IP válido"
+	}
+
 	return ""
 }

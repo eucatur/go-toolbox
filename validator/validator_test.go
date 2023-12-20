@@ -306,10 +306,10 @@ func Test_max(t *testing.T) {
 	expected.Details = map[string]interface{}{
 		"maxstring":      "Enter a maximum of ten characters",
 		"maxstringacute": "Enter a maximum of nine characters",
-		"maxint":     "The maximum value for the field is five",
-		"maxint64":   "The maximum value for the field is five",
-		"maxfloat64": "The maximum value for the field is 5.5",
-		"maxslice":   "Enter at most three elements",
+		"maxint":         "The maximum value for the field is five",
+		"maxint64":       "The maximum value for the field is five",
+		"maxfloat64":     "The maximum value for the field is 5.5",
+		"maxslice":       "Enter at most three elements",
 	}
 
 	test(t, expected, structMax)
@@ -523,7 +523,7 @@ func Test_ip(t *testing.T) {
 
 	test(t, expectedNil, structIP)
 
-	// uf incorreto
+	// ip incorreto
 	structIP.IPV4 = "192.168.10.256"
 
 	expected.Details = map[string]interface{}{
@@ -531,6 +531,51 @@ func Test_ip(t *testing.T) {
 	}
 
 	test(t, expected, structIP)
+
+	// ipv6 correto
+	structIPv6 := struct {
+		IPV6 string `json:"ipv6" validate:"ipv6" errmsg:"Message"`
+	}{
+		IPV6: "2804:18:1085:9823:204d:adc5:b1d9:2a33",
+	}
+
+	test(t, expectedNil, structIPv6)
+
+	// ipv6 incorreto
+	structIPv6.IPV6 = "192.168.10.256f4363822-92c0-41c6-9eda-9a1089cf2a7f"
+
+	expected.Details = map[string]interface{}{
+		"ipv6": "Message",
+	}
+
+	test(t, expected, structIPv6)
+
+	// ipv6 e ipv4 correto - IPv6
+	structIPv6_4 := struct {
+		IPV6_4 string `json:"ip" validate:"ipv46" errmsg:"Message"`
+	}{
+		IPV6_4: "2804:18:1085:9823:204d:adc5:b1d9:2a33",
+	}
+
+	test(t, expectedNil, structIPv6_4)
+
+	// ipv6 e ipv4 correto - IPv4
+	structIPv6_4 = struct {
+		IPV6_4 string `json:"ip" validate:"ipv46" errmsg:"Message"`
+	}{
+		IPV6_4: "192.168.10.1",
+	}
+
+	test(t, expectedNil, structIPv6_4)
+
+	// ip incorreto
+	structIPv6_4.IPV6_4 = "192.168.10.256f4363822-92c0-41c6-9eda-9a1089cf2a7f"
+
+	expected.Details = map[string]interface{}{
+		"ip": "Message",
+	}
+
+	test(t, expected, structIPv6_4)
 }
 
 func Test_func(t *testing.T) {
