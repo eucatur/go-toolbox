@@ -74,6 +74,13 @@ func TestTimeEUAScan(t *testing.T) {
 	err = dateActual.Scan(dataTimeEUA)
 	assert.Equal(nil, err)
 	assert.Equal(dateString, dateActual.String())
+
+	dateUint8 := []uint8("2018-12-08")
+	dateActual = TimeEUA{}
+
+	err = dateActual.Scan(dateUint8)
+	assert.Equal(nil, err)
+	assert.Equal(dateString, dateActual.String())
 }
 
 func TestTimeEUAValue(t *testing.T) {
