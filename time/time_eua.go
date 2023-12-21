@@ -42,6 +42,10 @@ func (t *TimeEUA) Scan(value interface{}) error {
 		if v != "" {
 			t.Time, err = time.Parse(TimeEUALayout, v)
 		}
+	case []uint8:
+		if string(v) != "" {
+			t.Time, err = time.Parse(TimeEUALayout, string(v))
+		}
 	}
 
 	return err
