@@ -173,6 +173,7 @@ func tryParse(dateTime string) tpDateTime {
 		"02/01/2006T15:04:05Z",
 		"02/01/2006 15:04:05",
 		"02/01/2006",
+		"2006-01-02",
 		"2006-01-02 15:04:05.999999 -0700 -07 m=+0.000000000",
 		"2006-01-02 15:04:05 -0700 -07",
 		"2006-01-02 15:04:05 -0700",
@@ -182,6 +183,19 @@ func tryParse(dateTime string) tpDateTime {
 		"2006-01-02T15:04:05",
 		"2006-01-02T15:04",
 		"2006-01-02 15:04:05",
+		"02/01/06T15:04:05Z",
+		"02/01/06 15:04:05",
+		"02/01/06",
+		"06-01-02",
+		"06-01-02 15:04:05.999999 -0700 -07 m=+0.000000000",
+		"06-01-02 15:04:05 -0700 -07",
+		"06-01-02 15:04:05 -0700",
+		"06-01-02 15:04:05 -0700 UTC",
+		"060102150405",
+		"06-01-02T15:04:05+00:00",
+		"06-01-02T15:04:05",
+		"06-01-02T15:04",
+		"06-01-02 15:04:05",
 	)
 
 	dt, err := now.Parse(dateTime)
@@ -352,4 +366,24 @@ func ParseToFullYear(year int64) int64 {
 	fullYear := int64(century) + year
 
 	return fullYear
+}
+
+func (dt DateTime) GetFullYear() int64 {
+
+	return ParseToFullYear(int64(dt.GetStdTime().Year()))
+
+}
+
+func (dt DateTime) GetShortYear() int64 {
+
+	year, _ := strconv.Atoi(dt.GetStdTime().Format("06"))
+
+	return int64(year)
+
+}
+
+func (dt DateTime) GetMonth() string {
+
+	return dt.GetStdTime().Format("01")
+
 }
