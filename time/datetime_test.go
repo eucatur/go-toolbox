@@ -839,3 +839,160 @@ func TestParseToFullYear(t *testing.T) {
 		})
 	}
 }
+
+func TestDateTime_GetFullYear(t *testing.T) {
+	tests := []struct {
+		name string
+		dt   DateTime
+		want int64
+	}{
+		{
+			name: "Obter o ano completo a partir de ano com 2 dígitos",
+			dt:   Set("24-01-03"),
+			want: 2024,
+		},
+		{
+			name: `Obter o ano completo a partir de quatro dígitos`,
+			dt:   Set("2025-01-03"),
+			want: 2025,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.dt.GetFullYear(); got != tt.want {
+				t.Errorf("DateTime.GetFullYear() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDateTime_GetShortYear(t *testing.T) {
+	tests := []struct {
+		name string
+		dt   DateTime
+		want int64
+	}{
+		{
+			name: "Obter o ano encurtado a partir de ano com 2 dígitos",
+			dt:   Set("24-01-03"),
+			want: 24,
+		},
+		{
+			name: `Obter o ano encurtado a partir de quatro dígitos`,
+			dt:   Set("2025-01-03"),
+			want: 25,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.dt.GetShortYear(); got != tt.want {
+				t.Errorf("DateTime.GetShortYear() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+
+}
+
+func TestDateTime_GetMonth(t *testing.T) {
+	tests := []struct {
+		name string
+		dt   DateTime
+		want string
+	}{
+		{
+			name: "Obter mês a partir de um dígito",
+			dt:   Set("2024-3-13"),
+			want: "03",
+		},
+		{
+			name: "Obter mês a partir de dois dígitos",
+			dt:   Set("2024-06-13"),
+			want: "06",
+		},
+		{
+			name: "Obter mês quando ele for dois dígitos",
+			dt:   Set("2024-11-13"),
+			want: "11",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.dt.GetMonth(); got != tt.want {
+				t.Errorf("DateTime.GetMonth() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDateTime_String(t *testing.T) {
+	tests := []struct {
+		name  string
+		strdt DateTime
+		want  string
+	}{
+		{
+			name:  "Obter string da data e hora no formato ISO 8601 a partir de uma data informada no formato ISO 8601",
+			strdt: Set("2024-03-13 18:36:01"),
+			want:  "2024-03-13 18:36:01",
+		},
+		{
+			name:  "Obter string da data e hora no forma ISO 8601 a partir de uma formato esperado pela lib",
+			strdt: Set("24-03-13 18:39:39"),
+			want:  "2024-03-13 18:39:39",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.strdt.String(); got != tt.want {
+				t.Errorf("DateTime.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDateTime_GetTimezone(t *testing.T) {
+	tests := []struct {
+		name  string
+		strdt DateTime
+		want  string
+	}{
+		{
+			name:  "Obter o timezone que foi definido",
+			strdt: Set("2024-03-13 18:40:28-03:00"),
+			want:  "-03:00",
+		},
+		{
+			name:  "Timezone não retornado quando nada é definido",
+			strdt: Set(""),
+			want:  "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.strdt.GetTimezone(); got != tt.want {
+				t.Errorf("DateTime.GetTimezone() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDateTime_GetTime(t *testing.T) {
+	tests := []struct {
+		name  string
+		strdt DateTime
+		want  string
+	}{
+		{
+			name:  "Obter a hora",
+			strdt: Set("2024-03-13 18:42:47"),
+			want:  "18:42:47",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.strdt.GetTime(); got != tt.want {
+				t.Errorf("DateTime.GetTime() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
