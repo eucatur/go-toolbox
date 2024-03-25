@@ -996,3 +996,117 @@ func TestDateTime_GetTime(t *testing.T) {
 		})
 	}
 }
+
+func Test_UseDateTimeMethods(t *testing.T) {
+
+	const dateTimeUsedForTest = "2024-03-16 08:45:29"
+
+	dateTimeForTest := Set(dateTimeUsedForTest)
+
+	tests := []struct {
+		name    string
+		runTest func(test *testing.T, dt *DateTime)
+	}{
+		{
+			name: `O método IsValid() deverá validar se a data definida é válida ou não.
+			> Neste teste os valores serão manipulados para teste do método IsValid()
+			Após os teste o valor será retornado para não afetar os outros cenários`,
+			runTest: func(test *testing.T, dt *DateTime) {
+
+				require.NoError(test, dt.IsValid())
+
+				*dt = "kl12j31kl2j3"
+
+				require.Error(test, dt.IsValid())
+
+				*dt = dateTimeUsedForTest
+
+			},
+		},
+		{
+			name: `O método String() deve retornar a data que foi definida sem quais outras
+			informações como timezone ou outro formato`,
+			runTest: func(test *testing.T, dt *DateTime) {
+
+				expected := "2024-03-16 08:45:29"
+
+				require.Equal(test, expected, dt.String())
+
+			},
+		},
+		{
+			name: `O método SetLocation() deve retornar a mesma data que foi definida mudando
+			apenas o fuso horário
+			> Utilizado o método GetDateTimeWithTimezone() para garantir o retorno no padrão 
+			RFC339`,
+			runTest: func(test *testing.T, dt *DateTime) {
+
+				dt.SetLocation(mockLoadLocationTest(t, "America/Sao_Paulo"))
+
+				expected := "2024-03-16T08:45:29-03:00"
+
+				require.Equal(test, expected, dt.GetDateTimeWithTimezone())
+
+				dt.SetLocation(mockLoadLocationTest(test, "America/Porto_Velho"))
+
+				expected = "2024-03-16T08:45:29-04:00"
+
+				require.Equal(test, expected, dt.GetDateTimeWithTimezone())
+
+				dt.SetLocation(mockLoadLocationTest(test, "America/Rio_Branco"))
+
+				expected = "2024-03-16T08:45:29-05:00"
+
+				require.Equal(test, expected, dt.GetDateTimeWithTimezone())
+
+			},
+		},
+		{
+			name: `O método GetDateTimeWithTimezone() deve retornar a mesma data com a
+			informação do fuso horário no padrão RFC3339.
+			> Uso do método SetLocation() para compatibilidade em outras regiões ao rodar o
+			teste`,
+			runTest: func(test *testing.T, dt *DateTime) {
+
+				expected := "2024-03-16T08:45:29-03:00"
+
+				dt.SetLocation(mockLoadLocationTest(test, "America/Sao_Paulo"))
+
+				require.Equal(test, expected, dt.GetDateTimeWithTimezone())
+
+			},
+		},
+		{
+			name: `Alteração de fuso horário com ChangeTimezone() deve se basear a partir do fuso
+			horário inicial.
+			> Uso do método SetLocation() para compatibilidade em outras regiões ao rodar o
+			teste`,
+			runTest: func(test *testing.T, dt *DateTime) {
+
+				dt.SetLocation(mockLoadLocationTest(test, "America/Sao_Paulo"))
+
+				expected := "2024-03-16T06:45:29-05:00"
+
+				dt.ChangeTimezone(mockLoadLocationTest(test, "America/Rio_Branco"))
+
+				require.Equal(t, expected, dt.GetDateTimeWithTimezone())
+
+			},
+		},
+	}
+
+	for _, tt := range tests {
+
+		t.Run(tt.name, func(t *testing.T) {
+
+			if tt.runTest != nil {
+				tt.runTest(t, &dateTimeForTest)
+			} else {
+				t.Fatal("nenhum test implementado")
+			}
+
+		})
+
+	}
+
+}
