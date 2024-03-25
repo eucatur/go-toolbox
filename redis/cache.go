@@ -177,7 +177,11 @@ func (c *Client) Conn() (conn redigo.Conn) {
 
 func (c *Client) Ping() (err error) {
 
-	_, err = c.Conn().Do(commandredis.Ping.String())
+	conn := c.Conn()
+
+	defer conn.Close()
+
+	_, err = conn.Do(commandredis.Ping.String())
 
 	if err != nil {
 		return
@@ -192,10 +196,14 @@ func (c Client) Set(key, value string, expirationSeconds int) (err error) {
 
 	key = c.Prefix + key
 
-	_, err = c.Conn().Do(commandredis.Set.String(), key, value)
+	conn := c.Conn()
+
+	defer conn.Close()
+
+	_, err = conn.Do(commandredis.Set.String(), key, value)
 
 	if expirationSeconds > 0 {
-		_, err = c.Conn().Do(commandredis.Expire.String(), key, expirationSeconds)
+		_, err = conn.Do(commandredis.Expire.String(), key, expirationSeconds)
 	}
 
 	return
@@ -203,7 +211,11 @@ func (c Client) Set(key, value string, expirationSeconds int) (err error) {
 
 // Get the value of a key
 func (c Client) Get(key string) (value string, err error) {
-	return redigo.String(c.Conn().Do(commandredis.Get.String(), c.Prefix+key))
+	conn := c.Conn()
+
+	defer conn.Close()
+
+	return redigo.String(conn.Do(commandredis.Get.String(), c.Prefix+key))
 }
 
 // MustGet the value of a key and you can check for a boolean returned
@@ -219,15 +231,24 @@ func (c Client) MustGet(key string) (value string, ok bool) {
 
 // Delete a key
 func (c Client) Delete(key string) (err error) {
-	_, err = c.Conn().Do(commandredis.Delete.String(), c.Prefix+key)
+	conn := c.Conn()
+
+	defer conn.Close()
+
+	_, err = conn.Do(commandredis.Delete.String(), c.Prefix+key)
 	return
 }
 
 // Delete todas as chaves onde contém o pattern localizado
 func (c Client) DeleteLike(pattern string) (err error) {
+
+	conn := c.Conn()
+
+	defer conn.Close()
+
 	iter := 0
 	for {
-		arr, err := redigo.Values(c.Conn().Do(commandredis.Scan.String(), iter, commandredis.Match.String(), "*"+pattern+"*"))
+		arr, err := redigo.Values(conn.Do(commandredis.Scan.String(), iter, commandredis.Match.String(), "*"+pattern+"*"))
 		if err != nil {
 			return fmt.Errorf("error retrieving '%s' keys", c.Prefix+pattern)
 		}
@@ -236,7 +257,7 @@ func (c Client) DeleteLike(pattern string) (err error) {
 		keys, _ := redigo.Strings(arr[1], nil)
 
 		for _, key := range keys {
-			_, err = c.Conn().Do(commandredis.Delete.String(), key)
+			_, err = conn.Do(commandredis.Delete.String(), key)
 
 			if err != nil {
 				return err
@@ -258,5 +279,9 @@ func (c Client) Do(comando string, args ...interface{}) (interface{}, error) {
 			return nil, value
 		}
 		return value, nil*/
-	return c.Conn().Do(comando, args...)
+	conn := c.Conn()
+
+	defer conn.Close()
+
+	return conn.Do(comando, args...)
 }
