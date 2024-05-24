@@ -93,3 +93,13 @@ func Valido(cnpj string) bool {
 
 	return true
 }
+
+func DefinirMascara(cnpj string) string {
+
+	re := regexp.MustCompile(`^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$`)
+	if !re.MatchString(cnpj) {
+		return cnpj
+	}
+	return re.ReplaceAllString(cnpj, "$1.$2.$3/$4-$5")
+
+}

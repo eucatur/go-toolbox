@@ -93,3 +93,14 @@ func Valido(cpf string) bool {
 
 	return true
 }
+
+func DefinirMascara(cpf string) string {
+
+	re := regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})$`)
+	if !re.MatchString(cpf) {
+		return cpf
+	}
+
+	return re.ReplaceAllString(cpf, "$1.$2.$3-$4")
+
+}
