@@ -190,3 +190,49 @@ func GetConnection(config DBConfig) (*sqlx.DB, error) {
 	return connect(config)
 
 }
+
+func ClearConnectionByFile(filePath string) {
+
+	if strings.EqualFold(filePath, "") {
+		return
+	}
+
+	db, found := connections[filePath]
+
+	if !found {
+		return
+	}
+
+	if db != nil {
+		if err := db.Ping(); err == nil {
+			db.Close()
+		}
+	}
+
+	connections[filePath] = nil
+
+	delete(connections, filePath)
+
+}
+
+func ClearConnectionByConfig(config DBConfig) {
+
+	dataConnection := getDataConnection(config)
+
+	db, found := connections[dataConnection]
+
+	if !found {
+		return
+	}
+
+	if db != nil {
+		if err := db.Ping(); err == nil {
+			db.Close()
+		}
+	}
+
+	connections[dataConnection] = nil
+
+	delete(connections, dataConnection)
+
+}
