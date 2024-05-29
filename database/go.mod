@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/newrelic/go-agent/v3 v3.18.2 // indirect
 	golang.org/x/net v0.12.0 // indirect
