@@ -3,6 +3,8 @@ package handler
 
 import (
 	"reflect"
+	"slices"
+	"strings"
 
 	"github.com/eucatur/go-toolbox/log"
 	"github.com/eucatur/go-toolbox/validator"
@@ -22,6 +24,13 @@ type Handler struct {
 
 // BindAndValidate like the name Validade and bind one struct with the validador golang lib
 func BindAndValidate(c echo.Context, obj interface{}, args ...interface{}) (err error) {
+
+	requestHeaderIsJSON := checkHeaderContentTypeIsJSON(c)
+
+	if !requestHeaderIsJSON {
+		return nil
+	}
+
 	obj = reflect.ValueOf(obj).Elem().Interface()
 	obj = reflect.New(reflect.TypeOf(obj)).Interface()
 
@@ -89,4 +98,23 @@ func Message(c echo.Context, m string) error {
 // ErrorMessage
 func ErrorMessage(c echo.Context, m string) error {
 	return c.JSON(400, &Handler{m})
+}
+
+func checkHeaderContentTypeIsJSON(c echo.Context) bool {
+
+	request := c.Request()
+
+	if request == nil {
+		return false
+	}
+
+	for key, value := range request.Header {
+
+		if strings.EqualFold(strings.ToLower(key), strings.ToLower(echo.HeaderContentType)) && slices.Contains(value, echo.MIMEApplicationJSON) {
+			return true
+		}
+
+	}
+
+	return false
 }
