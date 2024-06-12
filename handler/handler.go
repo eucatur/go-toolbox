@@ -25,12 +25,6 @@ type Handler struct {
 // BindAndValidate like the name Validade and bind one struct with the validador golang lib
 func BindAndValidate(c echo.Context, obj interface{}, args ...interface{}) (err error) {
 
-	requestHeaderIsJSON := checkHeaderContentTypeIsJSON(c)
-
-	if !requestHeaderIsJSON {
-		return nil
-	}
-
 	obj = reflect.ValueOf(obj).Elem().Interface()
 	obj = reflect.New(reflect.TypeOf(obj)).Interface()
 
@@ -39,21 +33,28 @@ func BindAndValidate(c echo.Context, obj interface{}, args ...interface{}) (err 
 		return
 	}
 
-	var options []string
-	if len(args) > 0 {
-		group, ok := args[0].(string)
-		if ok {
-			options = append(options, group)
-		}
-	}
+	requestHeaderIsJSON := checkHeaderContentTypeIsJSON(c)
 
-	vErr := validator.Validate(obj, options...)
-	if vErr != nil {
-		err = c.JSON(422, vErr)
-		if err != nil {
-			return
+	if requestHeaderIsJSON {
+
+		var options []string
+
+		if len(args) > 0 {
+			group, ok := args[0].(string)
+			if ok {
+				options = append(options, group)
+			}
 		}
-		return vErr
+
+		vErr := validator.Validate(obj, options...)
+		if vErr != nil {
+			err = c.JSON(422, vErr)
+			if err != nil {
+				return
+			}
+			return vErr
+		}
+
 	}
 
 	defaults.SetDefaults(obj)
