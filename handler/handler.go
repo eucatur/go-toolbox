@@ -3,8 +3,6 @@ package handler
 
 import (
 	"reflect"
-	"slices"
-	"strings"
 
 	"github.com/eucatur/go-toolbox/log"
 	"github.com/eucatur/go-toolbox/validator"
@@ -33,28 +31,22 @@ func BindAndValidate(c echo.Context, obj interface{}, args ...interface{}) (err 
 		return
 	}
 
-	requestHeaderIsJSON := checkHeaderContentTypeIsJSON(c)
+	var options []string
 
-	if requestHeaderIsJSON {
-
-		var options []string
-
-		if len(args) > 0 {
-			group, ok := args[0].(string)
-			if ok {
-				options = append(options, group)
-			}
+	if len(args) > 0 {
+		group, ok := args[0].(string)
+		if ok {
+			options = append(options, group)
 		}
+	}
 
-		vErr := validator.Validate(obj, options...)
-		if vErr != nil {
-			err = c.JSON(422, vErr)
-			if err != nil {
-				return
-			}
-			return vErr
+	vErr := validator.Validate(obj, options...)
+	if vErr != nil {
+		err = c.JSON(422, vErr)
+		if err != nil {
+			return
 		}
-
+		return vErr
 	}
 
 	defaults.SetDefaults(obj)
@@ -99,23 +91,4 @@ func Message(c echo.Context, m string) error {
 // ErrorMessage
 func ErrorMessage(c echo.Context, m string) error {
 	return c.JSON(400, &Handler{m})
-}
-
-func checkHeaderContentTypeIsJSON(c echo.Context) bool {
-
-	request := c.Request()
-
-	if request == nil {
-		return false
-	}
-
-	for key, value := range request.Header {
-
-		if strings.EqualFold(strings.ToLower(key), strings.ToLower(echo.HeaderContentType)) && slices.Contains(value, echo.MIMEApplicationJSON) {
-			return true
-		}
-
-	}
-
-	return false
 }
