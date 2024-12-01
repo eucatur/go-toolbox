@@ -50,6 +50,9 @@ func mockLoadLocationTest(t *testing.T, iana string) *time.Location {
 }
 
 func TestSet(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type args struct {
 		valueTime   time.Time
 		valueString string
@@ -121,6 +124,9 @@ func TestSet(t *testing.T) {
 }
 
 func TestDateTime_SetLocation(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type fields struct {
 		datetime time.Time
 		location time.Location
@@ -204,6 +210,9 @@ func TestDateTime_SetLocation(t *testing.T) {
 }
 
 func TestDateTime_GetDateTimeWithTimezone(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type fields struct {
 		datetime time.Time
 		location time.Location
@@ -246,6 +255,9 @@ func TestDateTime_GetDateTimeWithTimezone(t *testing.T) {
 }
 
 func TestDateTime_MarshalJSON(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type fields struct {
 		datetime time.Time
 		location time.Location
@@ -290,6 +302,9 @@ func TestDateTime_MarshalJSON(t *testing.T) {
 }
 
 func TestDateTime_UnmarshalJSON(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type fields struct {
 		datetime time.Time
 		location time.Location
@@ -362,6 +377,9 @@ func TestDateTime_UnmarshalJSON(t *testing.T) {
 }
 
 func TestDateTime_Value(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type fields struct {
 		datetime time.Time
 		location time.Location
@@ -405,15 +423,19 @@ func TestDateTime_Value(t *testing.T) {
 }
 
 func TestDateTime_Scan(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type args struct {
 		value interface{}
 	}
 	tests := []struct {
-		name    string
-		dt      DateTime
-		args    args
-		wantErr bool
-		want    DateTime
+		name        string
+		dt          DateTime
+		args        args
+		wantErr     bool
+		want        DateTime
+		prepareMock func()
 	}{
 		{
 			name: "Informação time.Time",
@@ -469,9 +491,28 @@ func TestDateTime_Scan(t *testing.T) {
 			wantErr: true,
 			want:    "",
 		},
+		{
+			name: "Retornar com timezone definido em CurrentTime",
+			dt:   "",
+			args: args{
+				value: "2023-11-28 14:17:20",
+			},
+			wantErr: false,
+			want:    "2023-11-28T14:17:20-03:00",
+			prepareMock: func() {
+
+				SetLocationInCurrentTime(mockLoadLocationTest(t, "America/Sao_Paulo"))
+
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
+			if tt.prepareMock != nil {
+				tt.prepareMock()
+			}
+
 			if err := tt.dt.Scan(tt.args.value); (err != nil) != tt.wantErr {
 				t.Errorf("DateTime.Scan() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -484,6 +525,9 @@ func TestDateTime_Scan(t *testing.T) {
 }
 
 func TestDateTime_IsValid(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	tests := []struct {
 		name    string
 		args    DateTime
@@ -528,6 +572,10 @@ func TestDateTime_IsValid(t *testing.T) {
 }
 
 func Test_MarshalJSON(t *testing.T) {
+
+	defer func() {
+		CurrentTime = time.Now
+	}()
 
 	type subfields struct {
 		DateTimeFOO DateTime `json:"date_time_foo,omitempty"`
@@ -612,13 +660,17 @@ func Test_MarshalJSON(t *testing.T) {
 }
 
 func Test_tryParse(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type args struct {
 		dateTime string
 	}
 	tests := []struct {
-		name string
-		args args
-		want tpDateTime
+		name        string
+		args        args
+		want        tpDateTime
+		prepareMock func()
 	}{
 		{
 			name: "Data e hora totalmente inválida e zuada",
@@ -660,9 +712,29 @@ func Test_tryParse(t *testing.T) {
 				time:     "21:52:02",
 			},
 		},
+		{
+			name: "Date time com timezone string",
+			args: args{
+				dateTime: "2023-11-27T21:52:02-03:00",
+			},
+			want: tpDateTime{
+				datetime: mockDateTimeTimezone(t, "2023-11-27 21:52:02", "America/Sao_Paulo").In(mockLoadLocationTest(t, "America/Sao_Paulo")),
+				location: mockLoadLocationTest(t, "America/Sao_Paulo"),
+				timezone: mockDateTimeTimezone(t, "2023-11-27 21:52:02", "America/Sao_Paulo").Format(timezoneformat),
+				date:     "2023-11-27",
+				time:     "21:52:02",
+			},
+			prepareMock: func() {
+				_toolParse = nil
+				SetLocationInCurrentTime(mockLoadLocationTest(t, "America/Sao_Paulo"))
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.prepareMock != nil {
+				tt.prepareMock()
+			}
 			if got := tryParse(tt.args.dateTime); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("tryParse() = %#v, want %#v", got, tt.want)
 			}
@@ -671,6 +743,9 @@ func Test_tryParse(t *testing.T) {
 }
 
 func TestDateTime_ChangeTimezone(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type args struct {
 		location *time.Location
 	}
@@ -709,6 +784,9 @@ func TestDateTime_ChangeTimezone(t *testing.T) {
 }
 
 func TestPeriod_PeriodValid(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	tests := []struct {
 		name   string
 		period Period
@@ -761,6 +839,9 @@ func TestPeriod_PeriodValid(t *testing.T) {
 }
 
 func TestParseToFullYear(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	type args struct {
 		year int64
 	}
@@ -841,6 +922,9 @@ func TestParseToFullYear(t *testing.T) {
 }
 
 func TestDateTime_GetFullYear(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	tests := []struct {
 		name string
 		dt   DateTime
@@ -867,6 +951,9 @@ func TestDateTime_GetFullYear(t *testing.T) {
 }
 
 func TestDateTime_GetShortYear(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	tests := []struct {
 		name string
 		dt   DateTime
@@ -894,6 +981,9 @@ func TestDateTime_GetShortYear(t *testing.T) {
 }
 
 func TestDateTime_GetMonth(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	tests := []struct {
 		name string
 		dt   DateTime
@@ -925,6 +1015,9 @@ func TestDateTime_GetMonth(t *testing.T) {
 }
 
 func TestDateTime_String(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	tests := []struct {
 		name  string
 		strdt DateTime
@@ -951,6 +1044,9 @@ func TestDateTime_String(t *testing.T) {
 }
 
 func TestDateTime_GetTimezone(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	tests := []struct {
 		name  string
 		strdt DateTime
@@ -977,6 +1073,9 @@ func TestDateTime_GetTimezone(t *testing.T) {
 }
 
 func TestDateTime_GetTime(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 	tests := []struct {
 		name  string
 		strdt DateTime
@@ -998,6 +1097,9 @@ func TestDateTime_GetTime(t *testing.T) {
 }
 
 func Test_UseDateTimeMethods(t *testing.T) {
+	defer func() {
+		CurrentTime = time.Now
+	}()
 
 	const dateTimeUsedForTest = "2024-03-16 08:45:29"
 

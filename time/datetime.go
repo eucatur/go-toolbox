@@ -3,6 +3,7 @@ package time
 import (
 	"database/sql/driver"
 	"fmt"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -63,6 +64,7 @@ var (
 		return true
 
 	}()
+	_toolParse *now.Now
 )
 
 type DateTime string
@@ -98,6 +100,26 @@ func Set[T time.Time | string](value T) DateTime {
 	dtFormated := dt.datetime.Format(time.RFC3339)
 
 	return DateTime(dtFormated)
+
+}
+
+func checkHasTimezone(value string) bool {
+
+	timezoneRegex := regexp.MustCompile(`(Z|[+-]\d{2}:\d{2})$`)
+
+	return timezoneRegex.MatchString(value)
+
+}
+
+func SetLocationInCurrentTime(location *time.Location) {
+
+	if location == nil {
+		return
+	}
+
+	CurrentTime = func() time.Time {
+		return time.Now().In(location)
+	}
 
 }
 
@@ -205,7 +227,11 @@ func newDateTime(dt time.Time) *tpDateTime {
 
 func tryParse(dateTime string) tpDateTime {
 
-	dt, err := now.Parse(dateTime)
+	if _toolParse == nil {
+		_toolParse = now.New(CurrentTime())
+	}
+
+	dt, err := _toolParse.Parse(dateTime)
 
 	if err != nil {
 		dt = GetTryParseDate(dateTime, "")
@@ -216,6 +242,20 @@ func tryParse(dateTime string) tpDateTime {
 
 	if dt.IsZero() || isMinDateTime(dt) {
 		return tpDateTime{}
+	}
+
+	hasTimezone := checkHasTimezone(dateTime)
+
+	if !hasTimezone {
+		dt, err = time.Parse(time.RFC3339,
+			fmt.Sprintf("%sT%s%s",
+				dt.Format(time.DateOnly),
+				dt.Format(time.TimeOnly),
+				CurrentTime().Format(timezoneformat)))
+
+		if err != nil {
+			return tpDateTime{}
+		}
 	}
 
 	newDt := newDateTime(dt)
