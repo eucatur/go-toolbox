@@ -1,4 +1,4 @@
-go 1.20
+go 1.24.0
 
 use (
 	./age
@@ -11,6 +11,7 @@ use (
 	./database
 	./env
 	./format
+	./gomap
 	./handler
 	./ibge
 	./json
