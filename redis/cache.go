@@ -132,7 +132,7 @@ func (c *Client) GetConnectionFromPool() (conn redigo.Conn) {
 					}
 
 					if slices.Contains(invalidDataConnection, true) {
-						msgErr += ". Verique se as informações de Host e/ou Port foram informadas\n"
+						msgErr += ". Verifique se as informações de Host e/ou Port foram informadas\n"
 					}
 
 					log.Default().Printf(msgErr)
