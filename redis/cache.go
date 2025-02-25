@@ -47,8 +47,8 @@ var DefaultClient = &Client{
 func (c *Client) setDefaultParamsConnection() {
 
 	const (
-		defatulMaxIdle     = 30
-		defaultMaxActive   = 30
+		defatulMaxIdle     = 10
+		defaultMaxActive   = 10
 		defaultIdleTimeout = 40
 	)
 
