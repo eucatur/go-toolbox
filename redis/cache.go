@@ -6,6 +6,7 @@ import (
 	"log"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	commandredis "github.com/eucatur/go-toolbox/redis/command_redis"
@@ -23,6 +24,7 @@ func (args Args) Add(value ...interface{}) Args {
 
 // Client is the structure used to create a redis connection client
 type Client struct {
+	Mutex           sync.RWMutex
 	Host            string
 	Port            int
 	DB              int
@@ -66,9 +68,9 @@ func (c *Client) setDefaultParamsConnection() {
 
 }
 
-func NewConnection(param Client) redigo.Conn {
+func NewConnection(param *Client) redigo.Conn {
 
-	client := &param
+	client := param
 
 	return client.GetConnectionFromPool()
 
@@ -135,7 +137,7 @@ func (c *Client) GetConnectionFromPool() (conn redigo.Conn) {
 						msgErr += ". Verifique se as informações de Host e/ou Port foram informadas\n"
 					}
 
-					log.Default().Printf(msgErr)
+					log.Default().Print(msgErr)
 
 					return nil, err
 				}
@@ -192,13 +194,13 @@ func (c *Client) Ping() (err error) {
 }
 
 // Set the string value of a key
-func (c Client) Set(key, value string, expirationSeconds int) (err error) {
+func (c *Client) Set(key, value string, expirationSeconds int) (err error) {
 
-	key = c.Prefix + key
+	c.Mutex.Lock()
 
 	conn := c.Conn()
 
-	defer conn.Close()
+	key = c.Prefix + key
 
 	_, err = conn.Do(commandredis.Set.String(), key, value)
 
@@ -206,20 +208,32 @@ func (c Client) Set(key, value string, expirationSeconds int) (err error) {
 		_, err = conn.Do(commandredis.Expire.String(), key, expirationSeconds)
 	}
 
+	conn.Close()
+
+	c.Mutex.Unlock()
+
 	return
 }
 
 // Get the value of a key
-func (c Client) Get(key string) (value string, err error) {
+func (c *Client) Get(key string) (value string, err error) {
+
+	c.Mutex.Lock()
+
 	conn := c.Conn()
 
-	defer conn.Close()
+	value, err = redigo.String(conn.Do(commandredis.Get.String(), c.Prefix+key))
 
-	return redigo.String(conn.Do(commandredis.Get.String(), c.Prefix+key))
+	conn.Close()
+
+	c.Mutex.Unlock()
+
+	return
+
 }
 
 // MustGet the value of a key and you can check for a boolean returned
-func (c Client) MustGet(key string) (value string, ok bool) {
+func (c *Client) MustGet(key string) (value string, ok bool) {
 	var err error
 	value, err = c.Get(key)
 	if err != nil || value == "" {
@@ -230,7 +244,7 @@ func (c Client) MustGet(key string) (value string, ok bool) {
 }
 
 // Delete a key
-func (c Client) Delete(key string) (err error) {
+func (c *Client) Delete(key string) (err error) {
 	conn := c.Conn()
 
 	defer conn.Close()
@@ -240,7 +254,7 @@ func (c Client) Delete(key string) (err error) {
 }
 
 // Delete todas as chaves onde contém o pattern localizado
-func (c Client) DeleteLike(pattern string) (err error) {
+func (c *Client) DeleteLike(pattern string) (err error) {
 
 	conn := c.Conn()
 
@@ -273,7 +287,7 @@ func (c Client) DeleteLike(pattern string) (err error) {
 }
 
 // Send Abre uma conexão com o Redis, executa o comando e depois a fecha
-func (c Client) Do(comando string, args ...interface{}) (interface{}, error) {
+func (c *Client) Do(comando string, args ...interface{}) (interface{}, error) {
 	/*	value := c.Conn().(comando, args...)
 		if value != nil {
 			return nil, value
