@@ -49,7 +49,7 @@ func (c *Client) setDefaultParamsConnection() {
 	const (
 		defatulMaxIdle     = 30
 		defaultMaxActive   = 30
-		defaultIdleTimeout = 300
+		defaultIdleTimeout = 40
 	)
 
 	if c.MaxIdle <= 0 {
