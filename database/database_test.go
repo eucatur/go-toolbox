@@ -8,7 +8,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
-	_ "github.com/newrelic/go-agent/v3/integrations/nrmysql"
 )
 
 func TestGetByFile(t *testing.T) {

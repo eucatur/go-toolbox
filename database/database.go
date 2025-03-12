@@ -7,13 +7,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/XSAM/otelsql"
 	"github.com/eucatur/go-toolbox/json"
 	"github.com/jmoiron/sqlx"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
-	_ "github.com/newrelic/go-agent/v3/integrations/nrmysql"
 )
 
 type DBConfig struct {
@@ -42,7 +42,7 @@ func get(filePath string) (*sqlx.DB, error) {
 	if db, found := connections[filePath]; found {
 		return db, nil
 	}
-	return nil, fmt.Errorf(`Error database not found. File path: %s`, filePath)
+	return nil, fmt.Errorf(`error database not found. File path: %s`, filePath)
 }
 
 func SetConnectionByFile(filePath string, db *sqlx.DB) {
@@ -94,6 +94,7 @@ func connect(config DBConfig) (*sqlx.DB, error) {
 	var (
 		db  *sqlx.DB
 		err error
+		driverName string
 	)
 
 	switch config.Type {
@@ -108,7 +109,14 @@ func connect(config DBConfig) (*sqlx.DB, error) {
 		))
 
 	case "mysql":
-		db, err = sqlx.Connect("nrmysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
+
+		driverName, err = otelsql.Register("mysql", otelsql.WithAttributes())
+
+		if err != nil {
+			return nil, fmt.Errorf(`erro ao registrar o driver mysql para otel. Detalhes: %s`, err.Error())
+		}
+
+		db, err = sqlx.Connect(driverName, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
 			config.User,
 			config.Password,
 			config.Host,
@@ -120,11 +128,11 @@ func connect(config DBConfig) (*sqlx.DB, error) {
 		db, err = sqlx.Connect("sqlite3", config.PathToDBFile)
 
 	default:
-		return nil, errors.New("Error database type is not supported")
+		return nil, errors.New("error database type is not supported")
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf(`Error connecting to database of type "%s" because of: %s`, config.Type, err.Error())
+		return nil, fmt.Errorf(`error connecting to database of type "%s" because of: %s`, config.Type, err.Error())
 	}
 
 	maxLifeTime := time.Duration(config.MaxLifeTime)
