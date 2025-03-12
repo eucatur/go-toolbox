@@ -46,7 +46,7 @@ func get(filePath string) (*sqlx.DB, error) {
 }
 
 func SetConnectionByFile(filePath string, db *sqlx.DB) {
-	
+
 	if strings.EqualFold(filePath, "") || db == nil {
 		return
 	}
@@ -56,7 +56,7 @@ func SetConnectionByFile(filePath string, db *sqlx.DB) {
 	}
 
 	connections[filePath] = db
-	
+
 }
 
 func getDataConnection(config DBConfig) string {
@@ -92,8 +92,8 @@ func SetConnectionByConfig(config DBConfig, db *sqlx.DB) {
 
 func connect(config DBConfig) (*sqlx.DB, error) {
 	var (
-		db  *sqlx.DB
-		err error
+		db         *sqlx.DB
+		err        error
 		driverName string
 	)
 
@@ -110,7 +110,9 @@ func connect(config DBConfig) (*sqlx.DB, error) {
 
 	case "mysql":
 
-		driverName, err = otelsql.Register("mysql", otelsql.WithAttributes(), otelsql.WithSpanOptions(otelsql.SpanOptions{OmitConnResetSession: true}))
+		driverName, err = otelsql.Register("mysql", otelsql.WithAttributes(),
+			otelsql.WithDisableSkipErrMeasurement(true),
+			otelsql.WithSpanOptions(otelsql.SpanOptions{DisableErrSkip: true}))
 
 		if err != nil {
 			return nil, fmt.Errorf(`erro ao registrar o driver mysql para otel. Detalhes: %s`, err.Error())
