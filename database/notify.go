@@ -115,5 +115,4 @@ func validateConfigNotify() {
 		panic("Type of DB not setted")
 	}
 
-	return
 }
