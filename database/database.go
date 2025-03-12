@@ -110,7 +110,7 @@ func connect(config DBConfig) (*sqlx.DB, error) {
 
 	case "mysql":
 
-		driverName, err = otelsql.Register("mysql", otelsql.WithAttributes())
+		driverName, err = otelsql.Register("mysql", otelsql.WithAttributes(), otelsql.WithSpanOptions(otelsql.SpanOptions{OmitConnResetSession: true}))
 
 		if err != nil {
 			return nil, fmt.Errorf(`erro ao registrar o driver mysql para otel. Detalhes: %s`, err.Error())
