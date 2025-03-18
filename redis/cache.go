@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -215,6 +216,28 @@ func (c *Client) Set(key, value string, expirationSeconds int) (err error) {
 	return
 }
 
+// SetBuf the string value of a key
+func (c *Client) SetBuf(key string, buf *bytes.Buffer, expirationSeconds int) (err error) {
+
+	c.Mutex.Lock()
+
+	conn := c.Conn()
+
+	key = c.Prefix + key
+
+	_, err = conn.Do(commandredis.Set.String(), key, buf.String())
+
+	if expirationSeconds > 0 {
+		_, err = conn.Do(commandredis.Expire.String(), key, expirationSeconds)
+	}
+
+	conn.Close()
+
+	c.Mutex.Unlock()
+
+	return
+}
+
 // Get the value of a key
 func (c *Client) Get(key string) (value string, err error) {
 
@@ -232,6 +255,25 @@ func (c *Client) Get(key string) (value string, err error) {
 
 }
 
+// Get the value of a key
+func (c *Client) GetBytes(key string, out *bytes.Buffer) (err error) {
+
+	c.Mutex.Lock()
+
+	conn := c.Conn()
+
+	value, err := redigo.Bytes(conn.Do(commandredis.Get.String(), c.Prefix+key))
+
+	conn.Close()
+
+	out.Write(value)
+
+	c.Mutex.Unlock()
+
+	return
+
+}
+
 // MustGet the value of a key and you can check for a boolean returned
 func (c *Client) MustGet(key string) (value string, ok bool) {
 	var err error
@@ -241,6 +283,13 @@ func (c *Client) MustGet(key string) (value string, ok bool) {
 	}
 
 	return value, true
+}
+
+// MustGet the value of a key and you can check for a boolean returned in []byte
+func (c *Client) MustGetBytes(key string, outValue *bytes.Buffer) (ok bool) {
+
+	return c.GetBytes(key, outValue) == nil
+
 }
 
 // Delete a key
