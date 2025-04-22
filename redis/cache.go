@@ -15,6 +15,8 @@ import (
 	redigo "github.com/gomodule/redigo/redis"
 )
 
+var ErrEmptyData error = redigo.ErrNil
+
 // Args is a helper for constructing command arguments from structured values.
 type Args []interface{}
 
