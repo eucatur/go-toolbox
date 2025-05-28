@@ -1,10 +1,13 @@
 package api
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/eucatur/go-toolbox/log"
@@ -48,13 +51,20 @@ func ProvideEchoInstance(task func(e *echo.Echo)) {
 	task(echoServer)
 }
 
-func Run() {
+func getPort() string {
 	// For Heroku Work
 	porta := os.Getenv("PORT")
 
 	if porta == "" {
 		porta = *port
 	}
+
+	return porta
+}
+
+func Run() {
+
+	porta := getPort()
 
 	echoServer.Logger.Fatal(echoServer.Start(":" + porta))
 }
@@ -100,4 +110,55 @@ func CustomHTTPErrorHandler(err error, c echo.Context) {
 	} else {
 		log.File(time.Now().Format("errors/2006/01/02/15h.log"), err.Error())
 	}
+}
+
+func RunWithGracefulShutdown(ctx context.Context, secondWaitToExit int) {
+
+	go runAsync()
+
+	settingGracefulShutdown(ctx, secondWaitToExit)
+
+}
+
+func settingGracefulShutdown(ctx context.Context, secondWaitToExit int) {
+
+	ctxGracefulShutdown, cancel := gracefulShutdown(ctx, secondWaitToExit)
+
+	if echoServer == nil {
+		log.Println("Servidor da api não instanciado")
+	}
+
+	if err := echoServer.Shutdown(ctxGracefulShutdown); err != nil {
+		log.Println(fmt.Sprintf("Falha ao encerrar o servidor de API. Detalhes: %s", err.Error()))
+	}
+
+	defer cancel()
+
+}
+
+func runAsync() {
+
+	porta := getPort()
+
+	if err := echoServer.Start(":" + porta); err != nil && err != http.ErrServerClosed {
+		echoServer.Logger.Fatal(err)
+	}
+}
+
+func gracefulShutdown(ctx context.Context, secondsWaitToExit int) (retCtx context.Context, cancel context.CancelFunc) {
+
+	stop := make(chan os.Signal, 1)
+
+	signal.Notify(stop, syscall.SIGTERM, os.Interrupt, syscall.SIGINT)
+
+	<-stop
+
+	timeToExitApp := time.Duration(secondsWaitToExit) * time.Second
+
+	log.Println(fmt.Sprintf("Se houver algum processamento em andamento a aplicação irá aguardar por mais %s até se encerrar", timeToExitApp.String()))
+
+	retCtx, cancel = context.WithTimeout(ctx, timeToExitApp)
+
+	return
+
 }
