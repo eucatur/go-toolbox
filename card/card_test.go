@@ -2,14 +2,91 @@ package card
 
 import (
 	"testing"
-
-	"github.com/magiconair/properties/assert"
 )
 
 func TestMask(t *testing.T) {
-	card, _ := Mask("5353 1607 6798 7690")
-
-	assert.Equal(t, card, "5353********7690", "The two words should be the same.")
+	type args struct {
+		cardNumber string
+	}
+	tests := []struct {
+		name         string
+		args         args
+		wantCardMask string
+		wantErr      bool
+		debug        bool
+	}{
+		{
+			name: "Número não informado",
+			args: args{
+				cardNumber: "",
+			},
+			wantCardMask: "",
+			wantErr:      true,
+		},
+		{
+			name: "Número com 13",
+			args: args{
+				cardNumber: "1234567890123",
+			},
+			wantCardMask: "123456XXX0123",
+			wantErr:      false,
+		},
+		{
+			name: "Número com 19",
+			args: args{
+				cardNumber: "1234567890123456789",
+			},
+			wantCardMask: "123456XXXXXXXXX6789",
+			wantErr:      false,
+		},
+		{
+			name: "Número inválido",
+			args: args{
+				cardNumber: "1234567890",
+			},
+			wantCardMask: "",
+			wantErr:      true,
+		},
+		{
+			name: "já mascarado",
+			args: args{
+				cardNumber: "400000XXXXXX1091",
+			},
+			wantCardMask: "400000XXXXXX1091",
+			wantErr:      false,
+		},
+		{
+			name: "Mascarar",
+			args: args{
+				cardNumber: "4000000000001091",
+			},
+			wantCardMask: "400000XXXXXX1091",
+			wantErr:      false,
+		},
+		{
+			name: "já mascarado com outro padrão",
+			args: args{
+				cardNumber: "400000******1091",
+			},
+			wantCardMask: "400000******1091",
+			wantErr:      false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.debug {
+				print("")
+			}
+			gotCardMask, err := Mask(tt.args.cardNumber)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Mask() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotCardMask != tt.wantCardMask {
+				t.Errorf("Mask() = %v, want %v", gotCardMask, tt.wantCardMask)
+			}
+		})
+	}
 }
 
 func TestGetInicialBin(t *testing.T) {
