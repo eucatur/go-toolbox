@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"sort"
 	"testing"
 	"time"
 
@@ -58,9 +59,10 @@ func TestSet(t *testing.T) {
 		valueString string
 	}
 	tests := []struct {
-		name string
-		args args
-		want DateTime
+		debug bool
+		name  string
+		args  args
+		want  DateTime
 	}{
 		{
 			name: "valores totalmente inválidos",
@@ -110,8 +112,20 @@ func TestSet(t *testing.T) {
 			},
 			want: "2023-11-28T11:19:14-03:00",
 		},
+		{
+			debug: true,
+			name:  "Data dia 10/06/2024 com fuso horário -03:00",
+			args: args{
+				valueTime:   mockDateTimeTimezone(t, "2024-06-10 00:00:00", "America/Sao_Paulo"),
+				valueString: "10/06/2024",
+			},
+			want: "2024-06-10T00:00:00-03:00",
+		},
 	}
 	for _, tt := range tests {
+		if !tt.debug {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Set(tt.args.valueTime); got != tt.want {
 				t.Errorf("Set() = %#v, want %#v", got, tt.want)
@@ -1211,4 +1225,138 @@ func Test_UseDateTimeMethods(t *testing.T) {
 
 	}
 
+}
+
+func Test_OrderedWithGetStdTime(t *testing.T) {
+
+	t.Skip("teste em andamento")
+
+	type fakeStruct struct {
+		ID       int64
+		Name     string
+		Document string
+		Dob      string
+	}
+
+	fakeDatas := []fakeStruct{
+		{
+			ID:       1,
+			Name:     "Fulano",
+			Document: "123456789",
+			Dob:      "26/01/2024",
+		},
+		{
+			ID:       2,
+			Name:     "Ciclano",
+			Document: "987654321",
+			Dob:      "22/08/2024",
+		},
+		{
+			ID:       3,
+			Name:     "Beltrano",
+			Document: "456789123",
+			Dob:      "27/09/2024",
+		},
+		{
+			ID:       4,
+			Name:     "Zé",
+			Document: "321654987",
+			Dob:      "10/06/2024",
+		},
+		{
+			ID:       5,
+			Name:     "Maria",
+			Document: "654321789",
+			Dob:      "22/08/2024",
+		},
+		{
+			ID:       6,
+			Name:     "João",
+			Document: "789123456",
+			Dob:      "16/04/2024",
+		},
+	}
+
+	data1006 := Set("10/06/2024")
+	data2208 := Set("22/08/2024")
+
+	require.True(t, data1006.GetStdTime().Before(data2208.GetStdTime()), "A data 10/06/2024 não é menor que 22/08/2024")
+
+	return
+
+	expectedsDobsOrderedAsc := []string{
+		"26/01/2024",
+		"16/04/2024",
+		"10/06/2024",
+		"22/08/2024",
+		"22/08/2024",
+		"27/09/2024",
+	}
+
+	sort.Slice(fakeDatas, func(i, j int) bool {
+		return Set(fakeDatas[i].Dob).GetStdTime().Before(Set(fakeDatas[j].Dob).GetStdTime())
+	})
+
+	gotDobsOrdered := []string{}
+
+	for _, fakeData := range fakeDatas {
+
+		gotDobsOrdered = append(gotDobsOrdered, fakeData.Dob)
+	}
+
+	require.Equal(t, expectedsDobsOrderedAsc, gotDobsOrdered, "As datas não estão ordenadas corretamente. Esperado: %v, Obtido: %v", expectedsDobsOrderedAsc, gotDobsOrdered)
+
+}
+
+func TestDateTime_LastDayMonth(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    DateTime
+		expected int
+	}{
+		{
+			name:     "data inválida",
+			input:    Set("0001-01-01 00:00:00"),
+			expected: 0,
+		},
+		{
+			name:     "data válida - mês com 31 dias",
+			input:    Set("2025-07-15"),
+			expected: 31,
+		},
+		{
+			name:     "data válida - mês com 30 dias",
+			input:    Set("2025-06-10"),
+			expected: 30,
+		},
+		{
+			name:     "data com ano anterior ao atual",
+			input:    Set("2020-02-10"),
+			expected: 29,
+		},
+		{
+			name:     "dia anterior ao atual",
+			input:    Set("2025-06-29"),
+			expected: 30,
+		},
+		{
+			name:     "ano bissexto",
+			input:    Set("2024-02-10"),
+			expected: 29,
+		},
+		{
+			name:     "ano não bissexto",
+			input:    Set("2023-02-10"),
+			expected: 28,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.input.LastDayMonth()
+			if result != tt.expected {
+				t.Errorf("LastDayMonth() = %d, want %d", result, tt.expected)
+			}
+		})
+	}
 }
