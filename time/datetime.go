@@ -434,3 +434,13 @@ func (dt DateTime) GetMonth() string {
 	return dt.GetStdTime().Format("01")
 
 }
+
+func (dt DateTime) LastDayMonth() int {
+	t := dt.GetStdTime()
+	if t.IsZero() {
+		return 0
+	}
+	nextMonth := t.AddDate(0, 1, -t.Day()+1)
+	lastDay := nextMonth.AddDate(0, 0, -1)
+	return lastDay.Day()
+}
