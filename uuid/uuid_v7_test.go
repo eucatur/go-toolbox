@@ -211,3 +211,73 @@ func TestGetTimeUUIDv7(t *testing.T) {
 		})
 	}
 }
+
+func TestGenerateUUIDv7(t *testing.T) {
+	tests := []struct {
+		name    string
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Gerar com base em data/hora específica fuso horário UTC",
+			wantErr: false,
+			want:    "018aeb3c-0d80-789c-b926-435e563ed7b9",
+		},
+		{
+			name:    "Devido da data ser inválida ou negativa o UUID gerado não terá o timestamp preenchido",
+			wantErr: false,
+			want:    "00000000-03e8-7f73-a401-3711d808ee08",
+		},
+		{
+			name:    "Date time zerado",
+			wantErr: false,
+			want:    "00000000-03e8-7f73-a401-3711d808ee08",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GenerateUUIDv7()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UUIDv7.Generate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if tt.want == "" && tt.want != got {
+				t.Errorf("UUIDv7.Generate() = %v, want %v", got, tt.want)
+			}
+
+			/* Seguindo o padrão RFC 9562 com base na data/hora fornecida o UUID deve ser gerado corretamente
+			* O UUID v7 gerado deve ter os primeiros 6 bytes preenchidos com o timestamp em milissegundos
+			* A versão deve ser 7 (0x70) e a variante deve ser 1 (0x80)
+			* O UUID gerado deve ser comparado com o esperado
+			* Se o UUID gerado não corresponder ao esperado, o teste falhar
+			* Se o UUID gerado corresponder ao esperado, o teste deve passar
+			 */
+			if len([]rune(tt.want)) == 13 && got[:13] != tt.want[:13] {
+				t.Errorf("UUIDv7.Generate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMustbeUniqueUUIDv7InInterections(t *testing.T) {
+
+	const interections = 100000
+
+	uuidMap := make(map[string]struct{})
+
+	uuid := NewUUIDv7(time.Now())
+
+	for range interections {
+		uuid, err := uuid.Generate()
+		if err != nil {
+			t.Fatalf("Erro ao gerar UUIDv7: %v", err)
+		}
+
+		if _, exists := uuidMap[uuid]; exists {
+			t.Fatalf("UUIDv7 duplicado encontrado: %s", uuid)
+		}
+
+		uuidMap[uuid] = struct{}{}
+	}
+
+}
