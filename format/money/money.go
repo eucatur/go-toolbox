@@ -53,14 +53,20 @@ func Reais(valor int64) string {
 func Round(value float64, precision int) float64 {
 	var round float64
 
+	round = math.Abs(value)
+
 	pow := math.Pow(10, float64(precision))
-	digit := pow * value
+	digit := pow * round
 	_, div := math.Modf(digit)
 
 	if div >= .5 {
 		round = math.Ceil(digit)
 	} else {
 		round = math.Floor(digit)
+	}
+
+	if value < 0 {
+		round = -round
 	}
 
 	return round / pow
@@ -103,6 +109,7 @@ func Format(valor interface{}) string {
 //	amount := Truncate(150.141, 2)  // 150.14
 //	amount := Truncate(150.145234234, 3)  // 150.145
 //	amount := Truncate(100.998, 2)  // 100.99
+//
 // package used github.com/shopspring/decimal
 func Truncate(value float64, decimals int) float64 {
 
