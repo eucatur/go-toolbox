@@ -132,6 +132,36 @@ func TestRound(t *testing.T) {
 			args: args{value: 100.998, precision: 2},
 			want: 101,
 		},
+		{
+			name: "roud value",
+			args: args{value: -0.000031, precision: 2},
+			want: 0,
+		},
+		{
+			name: "roud value",
+			args: args{value: -0.005031, precision: 2},
+			want: -0.01,
+		},
+		{
+			name: "roud value",
+			args: args{value: -0.004531, precision: 2},
+			want: 0,
+		},
+		{
+			name: "roud value",
+			args: args{value: -0.004531, precision: 3},
+			want: -0.005,
+		},
+		{
+			name: "roud value",
+			args: args{value: -0.004531, precision: 4},
+			want: -0.0045,
+		},
+		{
+			name: "roud value",
+			args: args{value: -0.004561, precision: 4},
+			want: -0.0046,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
