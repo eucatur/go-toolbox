@@ -1,10 +1,7 @@
 package cnpj
 
 import (
-	"log"
-	"math"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -24,74 +21,76 @@ func SomenteNumeros(cnpj string) string {
 	return strings.Join(r.FindAllString(cnpj, -1), "")
 }
 
+func RemoverMascara(cnpj string) string {
+	re := regexp.MustCompile(`[^A-Za-z0-9]`)
+	return re.ReplaceAllString(cnpj, "")
+}
+
 // Valido verifica se um cpf é válido ou não
 func Valido(cnpj string) bool {
 
-	if !mascarado(cnpj) && !desmascarado(cnpj) {
+	cnpj = RemoverMascara(cnpj)
+
+	clean := strings.TrimSpace(strings.ToUpper(cnpj))
+	if len(clean) != 14 {
+		return false
+	}
+	if len(clean) > 0 {
+		first := clean[0]
+		allSame := true
+		for i := 1; i < len(clean); i++ {
+			if clean[i] != first {
+				allSame = false
+				break
+			}
+		}
+		if allSame {
+			return false
+		}
+	}
+
+	values := make([]int, 0, 14)
+	for _, r := range clean {
+		switch {
+		case r >= '0' && r <= '9':
+			values = append(values, int(r)-48)
+		case r >= 'A' && r <= 'Z':
+			values = append(values, int(r)-48)
+		default:
+			return false
+		}
+	}
+	if len(values) != 14 {
 		return false
 	}
 
-	cnpj = SomenteNumeros(cnpj)
-
-	var (
-		nums         = make([]float64, 14)
-		err          error
-		seq1         = []float64{5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
-		seq2         = []float64{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
-		soma1, soma2 float64
-	)
-
-	for i := 0; i < 14; i++ {
-		nums[i], err = strconv.ParseFloat(cnpj[i:i+1], 64)
-		if err != nil {
-			log.Fatal(err)
-		}
+	weights1 := []int{5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
+	sum1 := 0
+	for i, weight := range weights1 {
+		sum1 += values[i] * weight
 	}
-
-	todosSaoIguais := true
-	for i := 0; i < 13; i++ {
-		if nums[i] != nums[i+1] {
-			todosSaoIguais = false
-		}
+	first := sum1 % 11
+	if first < 2 {
+		first = 0
+	} else {
+		first = 11 - first
 	}
-
-	if todosSaoIguais {
+	if first != values[12] {
 		return false
 	}
 
-	for i := 0; i < 12; i++ {
-		soma1 += nums[i] * seq1[i]
+	weights2 := []int{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
+	sum2 := 0
+	for i, weight := range weights2 {
+		sum2 += values[i] * weight
 	}
-
-	resto1 := math.Mod(soma1, 11)
-
-	if resto1 < 2 {
-		if nums[12] != 0 {
-			return false
-		}
+	second := sum2 % 11
+	if second < 2 {
+		second = 0
 	} else {
-		if nums[12] != 11-resto1 {
-			return false
-		}
+		second = 11 - second
 	}
-
-	for i := 0; i < 13; i++ {
-		soma2 += nums[i] * seq2[i]
-	}
-
-	resto2 := math.Mod(soma2, 11)
-
-	if resto2 < 2 {
-		if nums[13] != 0 {
-			return false
-		}
-	} else {
-		if nums[13] != 11-resto2 {
-			return false
-		}
-	}
-
-	return true
+	return second == values[13]
 }
 
 func DefinirMascara(cnpj string) string {
